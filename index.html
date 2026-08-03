@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="ko" data-seed-color-mode="light-only" data-seed-user-color-scheme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="노블컴퍼니 — 작은 날갯짓이 만드는 큰 변화, 나비효과를 경험하세요. IMC · SA · DA · VIRAL 통합 광고 대행" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
+    />
+    <title>노블컴퍼니 | NOBLE COMPANY</title>
+    <!-- 첫 페인트 전에 테마를 확정해 배경색이 번쩍이는 것(FOUC)을 막는다.
+         저장된 선택이 없으면 OS 설정을 따르고, 기본은 다크. -->
+    <script>
+      (function () {
+        var t;
+        try {
+          t = localStorage.getItem("noble-theme");
+        } catch (e) {}
+        if (t !== "light" && t !== "dark") {
+          t = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+        }
+        document.documentElement.dataset.theme = t;
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

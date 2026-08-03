@@ -1,0 +1,21 @@
+# 의존성 / 빌드 산출물
+node_modules/
+dist/
+*.tsbuildinfo
+
+# --- 사내 자료 (공개 저장소에 올리지 않는다) ---
+# 클라이언트 캠페인 목표·운영전략·팀 배정이 담긴 원본 취합 자료
+포트폴리오 취합 파일 모음/
+# 내부 기획 제안서
+plan.pptx
+# 경쟁사 레퍼런스 캡처
+레퍼런스 이미지/
+# 팀별 미확보 현황 (내부 공유용)
+PORTFOLIO-GAPS.md
+
+# 로컬 환경
+.env
+.env.local
+.DS_Store
+Thumbs.db
+*.log
