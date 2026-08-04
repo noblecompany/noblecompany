@@ -816,6 +816,23 @@ img {
   color: var(--accent-text);
 }
 
+/* 재무 수치는 자릿수가 많아(11자리) 기본 크기로는 카드를 넘친다.
+   1fr 은 콘텐츠 최소 폭 아래로 줄지 않아 칸이 밀리므로 minmax(0,1fr) 로 잡는다. */
+.stats--figures {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.stats--figures .stat strong {
+  font-size: clamp(19px, 1.9vw, 27px);
+  letter-spacing: -0.03em;
+  word-break: keep-all;
+}
+
+.stats--figures .stat strong em {
+  margin-left: 2px;
+  font-size: 0.8em;
+}
+
 .stat span {
   display: block;
   margin-top: 8px;
@@ -2224,6 +2241,10 @@ img {
   .stats {
     grid-template-columns: repeat(2, 1fr);
   }
+
+  .stats--figures {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 768px) {
@@ -2388,6 +2409,11 @@ img {
   .stats {
     grid-template-columns: 1fr 1fr;
     gap: 14px;
+  }
+
+  /* 좁은 화면에서 11자리 숫자를 2열에 넣으면 칸이 밀려 가로 스크롤이 생긴다 */
+  .stats--figures {
+    grid-template-columns: 1fr;
   }
 
   .stat {

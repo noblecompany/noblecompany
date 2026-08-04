@@ -184,37 +184,35 @@ export default function Home() {
         <div className="container">
           <Reveal>
             <h2 className="section-title">
-              결과로 증명하는
+              매년 성장해나가는
               <br />
-              노블컴퍼니의 광고 운영 역량
+              노블컴퍼니의 브랜드 가치
             </h2>
           </Reveal>
-          {/* TODO: 실제 성과 수치 확정 시 교체 (플레이스홀더) */}
+          {/* TODO: 재무 수치의 기준 연도(예: 2025년) 확정 시 라벨에 함께 표기 */}
           <Reveal>
-            <div className="stats">
+            <div className="stats stats--figures">
               <div className="stat">
                 <strong>
-                  120<em>+</em>
+                  24,538,208,955<em>원</em>
                 </strong>
-                <span>누적 클라이언트</span>
+                <span>매출총이익</span>
               </div>
               <div className="stat">
                 <strong>
-                  850<em>+</em>
+                  464,111,579<em>원</em>
                 </strong>
-                <span>누적 캠페인</span>
+                <span>영업이익</span>
               </div>
               <div className="stat">
                 <strong>
-                  320<em>%</em>
+                  601,136,106<em>원</em>
                 </strong>
-                <span>평균 ROAS 개선</span>
+                <span>당기순이익</span>
               </div>
               <div className="stat">
-                <strong>
-                  98<em>%</em>
-                </strong>
-                <span>클라이언트 재계약률</span>
+                <strong>800</strong>
+                <span>브랜드</span>
               </div>
             </div>
           </Reveal>
