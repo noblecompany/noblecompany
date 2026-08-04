@@ -4,9 +4,10 @@ import { asset } from "../lib/asset";
 import { useTheme } from "../lib/theme";
 
 const NAV = [
+  { to: "/about", label: "ABOUT" },
   { to: "/work", label: "WORK" },
   { to: "/solution", label: "SOLUTION" },
-  { to: "/about", label: "ABOUT" },
+  { to: "/careers", label: "CAREERS" },
   { to: "/contact", label: "CONTACT" },
 ];
 

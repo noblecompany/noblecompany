@@ -1,9 +1,18 @@
 import { Link } from "react-router-dom";
+import {
+  PARTNER_EMAIL,
+  PARTNER_TEL,
+  RECRUIT_EMAIL,
+  RECRUIT_TEL,
+  SALES_EMAIL,
+  SALES_TEL,
+} from "../data/company";
+import BrochureCta from "./BrochureCta";
 
 const CONTACTS = [
-  { label: "광고문의", tel: "02-474-1941", mail: "noble@e-noble.kr" },
-  { label: "제휴문의", tel: "02-2088-7062", mail: "kbn@e-noble.kr" },
-  { label: "채용문의", tel: "02-2088-7047", mail: "hrm@e-noble.kr" },
+  { label: "광고문의", tel: SALES_TEL, mail: SALES_EMAIL },
+  { label: "제휴문의", tel: PARTNER_TEL, mail: PARTNER_EMAIL },
+  { label: "채용문의", tel: RECRUIT_TEL, mail: RECRUIT_EMAIL },
 ];
 
 export default function Footer() {
@@ -46,6 +55,8 @@ export default function Footer() {
         <nav className="footer__links" aria-label="푸터 메뉴">
           <a href="tel:024741941">문의전화</a>
           <a href="mailto:noble@e-noble.kr">메일</a>
+          <BrochureCta variant="link" />
+          <Link to="/careers">채용공고</Link>
           <Link to="/contact">오시는길</Link>
           {/* TODO: 개인정보처리방침·이메일무단수집거부 페이지 제작 시 연결 */}
           <a href="#" onClick={(e) => e.preventDefault()}>

@@ -56,10 +56,12 @@ export default function PortfolioScroll() {
       <div className="container pf-scroll__grid">
         <div className="pf-scroll__text">
           <h2 className="section-title">
-            노블컴퍼니의 <span className="accent">나비효과</span>를<br />
-            경험한 기업
+            <span className="accent">성과의 차이</span>를<br />
+            경험한 브랜드
           </h2>
-          <p className="section-desc">다양한 업종에서 실제 성과로 증명해온 캠페인들입니다.</p>
+          <p className="section-desc">
+            다양한 산업과 브랜드의 성장을 함께하며 실제 캠페인 성과로 증명해왔습니다.
+          </p>
           <Link to="/work" className="btn btn--primary" style={{ marginTop: 36 }}>
             포트폴리오 확인
           </Link>

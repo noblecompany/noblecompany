@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { ActionButton } from "seed-design/ui/action-button";
 import { TextField, TextFieldInput } from "seed-design/ui/text-field";
+import BrochureCta from "../components/BrochureCta";
 import Reveal from "../components/Reveal";
 
 /** 슬라이드 15·45~46 — 선택형 UI 중심의 문의 폼 */
@@ -135,6 +136,9 @@ export default function Contact() {
                   <dd>서울 강동구 성내로 48 (성내동, 씨네월드) 6층</dd>
                 </div>
               </dl>
+
+              {/* 문의 전에 회사 정보를 먼저 확인하려는 방문자용 */}
+              <BrochureCta variant="button" className="contact-info__brochure" />
             </div>
           </Reveal>
 

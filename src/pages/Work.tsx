@@ -50,7 +50,7 @@ export default function Work() {
           <Reveal>
             <h1 className="page-hero__title">WORK</h1>
             <p className="page-hero__sub">
-              노블컴퍼니의 <span className="accent">나비효과</span>를 경험한 기업
+              <span className="accent">성과의 차이</span>를 경험한 브랜드
             </p>
           </Reveal>
 

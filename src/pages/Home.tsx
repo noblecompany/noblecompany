@@ -126,8 +126,13 @@ export default function Home() {
             {HERO_LINES[lineIndex]}
           </h1>
           <p className="hero__tagline">
-            작은 날개짓의 파장이 태풍으로 커지듯
-            <strong>노블컴퍼니가 매출의 파장을 크게 해드리겠습니다.</strong>
+            브랜드를 분석하고 이해하고 시작합니다.
+            <strong>기계적으로 운영하는 광고는 성과를 만들 수 없습니다</strong>
+          </p>
+          <p className="hero__sub">
+            노블컴퍼니는 브랜드를 분석하고 경쟁사를 이해한 후 시작합니다.
+            <br />
+            목표를 분석하고 데이터를 읽고 전략을 도출해내는 광고회사입니다.
           </p>
           <p className="hero__sub">IMC · SA · DA · VIRAL, 광고의 시작부터 성과까지 함께합니다.</p>
           <div className="hero__cta">
@@ -153,7 +158,13 @@ export default function Home() {
               <h2>
                 광고는 비용이 아니라
                 <br />
-                <span className="accent">성장의 날갯짓</span>입니다.
+                {/* 한 줄에 넣으면 '파트/너'로 끊겨 어절 단위로 나눈다 */}
+                <span className="accent">
+                  브랜드의 시간을
+                  <br />
+                  아껴주는 파트너
+                </span>
+                입니다.
               </h2>
               <p className="section-desc">
                 우리는 클라이언트를 광고주가 아닌 함께 성장하는 파트너로 바라봅니다. 불필요한
