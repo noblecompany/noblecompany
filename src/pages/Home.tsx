@@ -211,7 +211,9 @@ export default function Home() {
                 <span>당기순이익</span>
               </div>
               <div className="stat">
-                <strong>800</strong>
+                <strong>
+                  800<em>+</em>
+                </strong>
                 <span>브랜드</span>
               </div>
             </div>
