@@ -60,6 +60,14 @@ export const companyInfo: { label: string; value: string | string[] }[] = [
   },
 ];
 
+/** ABOUT > 소개 조직도. 본부 순서가 그대로 좌→우 배치가 된다 */
+export const orgChart: { division: string; teams: string[] }[] = [
+  { division: "전략본부", teams: ["기획 1팀", "기획 2팀", "기획 3팀", "마케팅 1팀", "마케팅 2팀"] },
+  { division: "콘텐츠본부", teams: ["콘텐츠 마케팅팀", "디자인팀", "미디어 영상팀"] },
+  { division: "운영본부", teams: ["채널팀", "운영 지원팀", "인사팀", "회계팀", "개발팀"] },
+  { division: "브랜드사업본부", teams: ["커머스 사업부", "후원 사업부"] },
+];
+
 /** 연혁 한 구간 안의 묶음. year 가 null 이면 연도 미상 이력(광고 수주 등) */
 export interface HistoryGroup {
   year: string | null;

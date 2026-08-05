@@ -1,7 +1,7 @@
 import { Link, useParams } from "react-router-dom";
 import BrochureCta from "../components/BrochureCta";
 import Reveal from "../components/Reveal";
-import { companyInfo, history } from "../data/company";
+import { companyInfo, history, orgChart } from "../data/company";
 import { asset } from "../lib/asset";
 
 const TABS = [
@@ -126,6 +126,29 @@ function IntroTab() {
               </div>
             </Reveal>
           </div>
+
+          <Reveal>
+            <div className="org">
+              <span className="eyebrow">ORGANIZATION</span>
+              <h3 className="org__title">조직 구성</h3>
+
+              <div className="org__chart">
+                <div className="org__ceo">CEO</div>
+                <div className="org__divisions">
+                  {orgChart.map((d) => (
+                    <div className="org__division" key={d.division}>
+                      <div className="org__head">{d.division}</div>
+                      <ul className="org__teams">
+                        {d.teams.map((t) => (
+                          <li key={t}>{t}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </Reveal>
         </div>
       </section>
 
