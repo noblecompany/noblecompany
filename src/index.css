@@ -284,7 +284,28 @@ img {
 
 .header__nav {
   display: flex;
-  gap: 40px;
+  align-items: center;
+  gap: 34px;
+}
+
+/* 외부 사이트로 나가는 CTA — 메뉴 링크와 구분되게 채운 알약으로 둔다 */
+.header__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 18px;
+  border-radius: 999px;
+  background: var(--noble-blue);
+  color: var(--on-accent);
+  font-size: 14px;
+  font-weight: 800;
+  white-space: nowrap;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.header__cta:hover {
+  background: var(--noble-blue-bright);
+  transform: translateY(-1px);
 }
 
 .header__link {
@@ -2394,6 +2415,14 @@ img {
 
   .header__link.is-active::after {
     display: none;
+  }
+
+  /* 드롭다운 안에서는 폭을 꽉 채운 버튼으로 */
+  .header__cta {
+    margin-top: 18px;
+    justify-content: center;
+    padding: 14px 18px;
+    font-size: 15px;
   }
 
   .header__toggle {

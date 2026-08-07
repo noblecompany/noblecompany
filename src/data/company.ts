@@ -16,6 +16,9 @@ export const PARTNER_TEL = "02-2088-7062";
 export const RECRUIT_EMAIL = "hrm@e-noble.kr";
 export const RECRUIT_TEL = "02-2088-7047";
 
+/** 헤더 CTA — 별도 사이트로 나가는 디자인 포트폴리오 */
+export const DESIGN_PORTFOLIO_URL = "https://nb-web-one.vercel.app/";
+
 export interface Brochure {
   /** public/ 기준 경로. 파일 미확보 상태면 null */
   file: string | null;

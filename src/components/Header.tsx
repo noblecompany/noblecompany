@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
+import { DESIGN_PORTFOLIO_URL } from "../data/company";
 import { asset } from "../lib/asset";
 import { useTheme } from "../lib/theme";
 
@@ -59,6 +60,30 @@ export default function Header() {
               {item.label}
             </NavLink>
           ))}
+
+          {/* 별도 사이트로 나가므로 새 탭에서 연다 */}
+          <a
+            className="header__cta"
+            href={DESIGN_PORTFOLIO_URL}
+            target="_blank"
+            rel="noreferrer"
+          >
+            디자인 포트폴리오
+            <svg
+              width="13"
+              height="13"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.4"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M8 6h10v10" />
+              <path d="M18 6 6 18" />
+            </svg>
+          </a>
         </nav>
 
         <button
