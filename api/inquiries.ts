@@ -1,8 +1,8 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { z } from "zod";
-import { adminDb, retentionDate } from "./_lib/db";
-import { clientIp, fail, ok, rateLimited, verifyTurnstile } from "./_lib/http";
-import { sendNotificationMail } from "./_lib/mail";
+import { adminDb, retentionDate } from "./_lib/db.js";
+import { clientIp, fail, ok, rateLimited, verifyTurnstile } from "./_lib/http.js";
+import { sendNotificationMail } from "./_lib/mail.js";
 
 /** POST /api/inquiries — 프로젝트 문의 접수 (F1). Contact.tsx 폼과 1:1 */
 const Body = z.object({

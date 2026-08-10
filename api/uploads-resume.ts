@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { z } from "zod";
-import { adminDb } from "./_lib/db";
-import { clientIp, fail, ok, rateLimited } from "./_lib/http";
+import { adminDb } from "./_lib/db.js";
+import { clientIp, fail, ok, rateLimited } from "./_lib/http.js";
 
 /**
  * POST /api/uploads-resume — 이력서 업로드용 signed URL 발급 (§3.2).

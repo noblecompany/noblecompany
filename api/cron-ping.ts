@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { adminDb } from "./_lib/db";
-import { fail, ok } from "./_lib/http";
+import { adminDb } from "./_lib/db.js";
+import { fail, ok } from "./_lib/http.js";
 
 /**
  * GET /api/cron-ping — Supabase 무료 플랜 일시정지 방지용 일일 활동 (§3.2 플랜 정책).

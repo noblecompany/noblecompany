@@ -1,8 +1,8 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { z } from "zod";
-import { adminDb, retentionDate } from "./_lib/db";
-import { clientIp, fail, ok, rateLimited, verifyTurnstile } from "./_lib/http";
-import { sendNotificationMail } from "./_lib/mail";
+import { adminDb, retentionDate } from "./_lib/db.js";
+import { clientIp, fail, ok, rateLimited, verifyTurnstile } from "./_lib/http.js";
+import { sendNotificationMail } from "./_lib/mail.js";
 
 /**
  * POST /api/applications — 채용 지원 접수 (F2).
