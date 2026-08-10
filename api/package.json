@@ -1,0 +1,4 @@
+{
+  "//": "루트가 type:module(ESM)이라 CJS 의존성(nodemailer)이 함수 번들에서 'Dynamic require is not supported'로 죽는다. api/ 만 CJS로 컴파일해 인터롭 문제를 없앤다.",
+  "type": "commonjs"
+}
