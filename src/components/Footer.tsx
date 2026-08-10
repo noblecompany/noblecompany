@@ -58,13 +58,8 @@ export default function Footer() {
           <BrochureCta variant="link" />
           <Link to="/careers">채용공고</Link>
           <Link to="/contact">오시는길</Link>
-          {/* TODO: 개인정보처리방침·이메일무단수집거부 페이지 제작 시 연결 */}
-          <a href="#" onClick={(e) => e.preventDefault()}>
-            개인정보처리방침
-          </a>
-          <a href="#" onClick={(e) => e.preventDefault()}>
-            이메일무단수집거부
-          </a>
+          <Link to="/privacy">개인정보처리방침</Link>
+          <Link to="/email-policy">이메일무단수집거부</Link>
         </nav>
 
         <div className="footer__bottom">

@@ -1957,6 +1957,50 @@ img {
   gap: 10px 28px;
 }
 
+/* ===== 정책 페이지 ===== */
+.policy-title {
+  margin: 0;
+  font-size: clamp(28px, 4vw, 44px);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+}
+
+.policy {
+  max-width: 820px;
+}
+
+.policy__block {
+  margin-bottom: 40px;
+}
+
+.policy__block h2 {
+  margin: 0 0 14px;
+  font-size: 19px;
+  font-weight: 800;
+}
+
+.policy__block p,
+.policy__block li {
+  font-size: 15px;
+  line-height: 1.85;
+  color: var(--noble-text-dim);
+}
+
+.policy__block p {
+  margin: 0 0 12px;
+}
+
+.policy__block ul {
+  margin: 0 0 12px;
+  padding-left: 20px;
+  display: grid;
+  gap: 8px;
+}
+
+.policy__block b {
+  color: var(--text);
+}
+
 /* ===== 회사소개서 다운로드 ===== */
 .brochure-card {
   display: flex;

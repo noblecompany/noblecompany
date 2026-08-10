@@ -13,15 +13,20 @@
     "@karrotmarket/react-monochrome-icon": "^1.25.0",
     "@seed-design/css": "latest",
     "@seed-design/react": "latest",
+    "@supabase/supabase-js": "^2.112.2",
+    "nodemailer": "^9.0.5",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-router-dom": "^6.26.0"
+    "react-router-dom": "^6.26.0",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@seed-design/vite-plugin": "latest",
     "@types/node": "^26.1.2",
+    "@types/nodemailer": "^8.0.1",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
+    "@vercel/node": "^5.9.7",
     "@vitejs/plugin-react": "^4.3.1",
     "playwright-core": "^1.62.0",
     "typescript": "^5.5.3",
