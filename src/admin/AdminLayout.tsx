@@ -82,8 +82,9 @@ export default function AdminLayout({
           </div>
 
           <div className="adm-top__actions">
-            <span className="adm-devbadge" title="Supabase 연동 전 목데이터로 동작 중">
-              개발 모드 · 목데이터
+            {/* 문의·지원 데이터 실연동(1-8) 완료 시 제거 */}
+            <span className="adm-devbadge" title="화면 데이터는 아직 목데이터입니다 (접수 연동 진행 중)">
+              목데이터 표시 중
             </span>
             <NotificationBell />
             <button

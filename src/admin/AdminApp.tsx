@@ -1,5 +1,7 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
+import type { Session } from "@supabase/supabase-js";
 import { Navigate, Route, Routes } from "react-router-dom";
+import { supabase } from "../lib/supabaseClient";
 import AdminLayout from "./AdminLayout";
 import Applications from "./pages/Applications";
 import Dashboard from "./pages/Dashboard";
@@ -7,35 +9,33 @@ import Inquiries from "./pages/Inquiries";
 import "./admin.css";
 
 /**
- * 어드민 진입점.
- * 인증은 Supabase Auth(1-3) 연동 전까지 세션스토리지 기반 개발 모드로 동작한다.
- * — 실제 데이터가 없으므로 게이트는 화면 흐름 확인용이다.
+ * 어드민 진입점 — Supabase Auth 세션 기반 (1-3).
+ * 계정 생성은 Supabase 대시보드 → Authentication → Users 에서만 한다
+ * (공개 가입 없음 — 5인 소수 운영).
  */
-const DEV_SESSION_KEY = "noble-admin-dev";
-
 export default function AdminApp() {
-  const [authed, setAuthed] = useState(
-    () => sessionStorage.getItem(DEV_SESSION_KEY) === "1",
-  );
+  const [session, setSession] = useState<Session | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  if (!authed) {
-    return (
-      <Login
-        onLogin={() => {
-          sessionStorage.setItem(DEV_SESSION_KEY, "1");
-          setAuthed(true);
-        }}
-      />
-    );
-  }
+  useEffect(() => {
+    if (!supabase) {
+      setLoading(false);
+      return;
+    }
+    supabase.auth.getSession().then(({ data }) => {
+      setSession(data.session);
+      setLoading(false);
+    });
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, s) => setSession(s));
+    return () => sub.subscription.unsubscribe();
+  }, []);
+
+  if (loading) return null;
+
+  if (!session) return <Login />;
 
   return (
-    <AdminLayout
-      onLogout={() => {
-        sessionStorage.removeItem(DEV_SESSION_KEY);
-        setAuthed(false);
-      }}
-    >
+    <AdminLayout onLogout={() => void supabase?.auth.signOut()}>
       <Routes>
         <Route path="/" element={<Dashboard />} />
         <Route path="/inquiries" element={<Inquiries />} />
@@ -46,19 +46,33 @@ export default function AdminApp() {
   );
 }
 
-function Login({ onLogin }: { onLogin: () => void }) {
+function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
 
-  const submit = (e: FormEvent) => {
+  const submit = async (e: FormEvent) => {
     e.preventDefault();
+    setError(null);
+
+    if (!supabase) {
+      setError("인증 설정이 없습니다. VITE_SUPABASE_* 환경변수를 확인해 주세요.");
+      return;
+    }
     if (!email || !password) {
       setError("이메일과 비밀번호를 입력해 주세요.");
       return;
     }
-    // TODO(1-3): Supabase Auth signInWithPassword 로 교체
-    onLogin();
+
+    setBusy(true);
+    const { error: err } = await supabase.auth.signInWithPassword({ email, password });
+    setBusy(false);
+    if (err) {
+      // 계정 없음/비번 오류를 구분해 알려주지 않는다 (계정 존재 여부 노출 방지)
+      setError("이메일 또는 비밀번호가 올바르지 않습니다.");
+    }
+    // 성공 시 onAuthStateChange 가 세션을 갱신한다
   };
 
   return (
@@ -92,12 +106,16 @@ function Login({ onLogin }: { onLogin: () => void }) {
 
         {error && <p className="adm-login__error">{error}</p>}
 
-        <button type="submit" className="adm-btn adm-btn--primary adm-login__submit">
-          로그인
+        <button
+          type="submit"
+          className="adm-btn adm-btn--primary adm-login__submit"
+          disabled={busy}
+        >
+          {busy ? "확인 중…" : "로그인"}
         </button>
 
         <p className="adm-login__dev">
-          개발 모드 — 인증 연동(Supabase) 전까지 임의 입력으로 로그인됩니다
+          계정 문의: 관리자(Supabase Authentication → Users 에서 발급)
         </p>
       </form>
     </div>
