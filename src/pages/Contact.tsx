@@ -46,6 +46,9 @@ export default function Contact() {
   const [form, setForm] = useState<FormState>(INITIAL);
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState(false);
+  const [busy, setBusy] = useState(false);
+  // 허니팟 — 사람 눈에 안 보이는 필드. 봇이 채우면 서버가 거른다 (F8)
+  const [website, setWebsite] = useState("");
 
   const set = <K extends keyof FormState>(key: K, value: FormState[K]) =>
     setForm((f) => ({ ...f, [key]: value }));
@@ -56,7 +59,7 @@ export default function Contact() {
       form.types.includes(type) ? form.types.filter((t) => t !== type) : [...form.types, type],
     );
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError(null);
 
@@ -73,23 +76,47 @@ export default function Contact() {
       return;
     }
 
-    // 문의 접수 백엔드 연동 전까지 메일 클라이언트로 전달합니다.
-    const body = [
-      `회사명: ${form.company}`,
-      `담당자: ${form.name}`,
-      `연락처: ${form.phone}`,
-      `이메일: ${form.email}`,
-      `문의 종류: ${form.types.join(", ")}`,
-      `예산: ${form.budget || "미입력"}`,
-      `기간: ${form.period || "미입력"}`,
-      "",
-      form.message,
-    ].join("\n");
-    window.location.href = `mailto:noble@e-noble.kr?subject=${encodeURIComponent(
-      `[프로젝트 문의] ${form.company}`,
-    )}&body=${encodeURIComponent(body)}`;
+    setBusy(true);
+    try {
+      const res = await fetch("/api/inquiries", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          company: form.company,
+          name: form.name,
+          phone: form.phone,
+          email: form.email,
+          types: form.types,
+          budget: form.budget || undefined,
+          period: form.period || undefined,
+          message: form.message || undefined,
+          agree: true,
+          website,
+        }),
+      });
 
-    setDone(true);
+      if (res.status === 201) {
+        setDone(true);
+        setForm(INITIAL);
+        return;
+      }
+      if (res.status === 429) {
+        setError("요청이 너무 잦습니다. 잠시 후 다시 시도해 주세요.");
+        return;
+      }
+      const body = (await res.json().catch(() => null)) as {
+        error?: { message?: string };
+      } | null;
+      setError(
+        body?.error?.message ??
+          "접수 중 오류가 발생했습니다. 잠시 후 다시 시도하거나 전화로 문의해 주세요.",
+      );
+    } catch {
+      // GitHub Pages 프리뷰·오프라인 등 API 없는 환경
+      setError("접수 서버에 연결하지 못했습니다. 전화(02-474-1941)로 문의해 주세요.");
+    } finally {
+      setBusy(false);
+    }
   };
 
   return (
@@ -269,12 +296,24 @@ export default function Contact() {
               )}
               {done && (
                 <div className="form-done">
-                  문의가 준비되었습니다. 메일 앱에서 전송을 완료해 주세요. 영업일 기준 1일 이내
+                  문의가 접수되었습니다. 담당 AE가 확인 후 영업일 기준 1일 이내에
                   회신드리겠습니다.
                 </div>
               )}
 
-              <ActionButton size="large" type="submit">
+              {/* 허니팟 — 화면·스크린리더 모두에서 숨김 */}
+              <input
+                type="text"
+                name="website"
+                value={website}
+                onChange={(e) => setWebsite(e.target.value)}
+                tabIndex={-1}
+                autoComplete="off"
+                aria-hidden="true"
+                style={{ position: "absolute", left: -9999, width: 1, height: 1, opacity: 0 }}
+              />
+
+              <ActionButton size="large" type="submit" loading={busy}>
                 프로젝트 문의 등록
               </ActionButton>
             </form>
