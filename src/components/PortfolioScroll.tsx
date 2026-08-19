@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import { works } from "../data/works";
+import { useWorks } from "../lib/content";
 import WorkCard from "./WorkCard";
 
 /**
@@ -9,6 +9,7 @@ import WorkCard from "./WorkCard";
  * 스크롤에 따라 열마다 다른 속도로 순차적으로 위로 올라갑니다.
  */
 export default function PortfolioScroll() {
+  const { works } = useWorks();
   const sectionRef = useRef<HTMLElement>(null);
   const col1Ref = useRef<HTMLDivElement>(null);
   const col2Ref = useRef<HTMLDivElement>(null);

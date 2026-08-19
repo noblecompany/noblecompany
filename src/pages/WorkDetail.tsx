@@ -1,14 +1,19 @@
 import { Link, Navigate, useParams } from "react-router-dom";
 import Reveal from "../components/Reveal";
 import { asset } from "../lib/asset";
-import { works } from "../data/works";
+import { useWorks } from "../lib/content";
 
 /** 슬라이드 35~36 — 상세: Situation / Solution / Result 케이스 스터디 */
 export default function WorkDetail() {
   const { id } = useParams<{ id: string }>();
+  const { works, loading } = useWorks();
   const work = works.find((w) => w.id === id);
 
-  if (!work) return <Navigate to="/work" replace />;
+  if (!work) {
+    // 목록을 아직 불러오는 중이면 판단을 미룬다 — 새로고침 직후 잘못된 리다이렉트 방지
+    if (loading) return <main style={{ minHeight: "60vh" }} />;
+    return <Navigate to="/work" replace />;
+  }
 
   // p33 — 이전/다음은 같은 광고 유형 안에서 롤링
   const siblings = works.filter((w) => w.category === work.category);

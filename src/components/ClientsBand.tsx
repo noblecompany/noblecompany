@@ -1,14 +1,18 @@
 import Reveal from "./Reveal";
-import { clients } from "../data/clients";
+import { useSiteContent } from "../lib/content";
 
 /**
  * 기획안 슬라이드 9 — Clients.
  * 레퍼런스는 클라이언트 로고 그리드지만 로고 원본이 아직 없어,
  * 확보 전까지 브랜드명 롤링으로 동일한 "거래 폭" 신뢰 메시지를 전달한다.
+ * 목록은 어드민(클라이언트 관리)에서 편집한다 — API 미연결 시 하드코딩 폴백.
  */
 const ROWS = 3;
 
 export default function ClientsBand() {
+  const { site } = useSiteContent();
+  const clients = site.clients;
+
   // 브랜드를 3줄로 나눠 줄마다 반대 방향으로 흐르게 한다
   const lines = Array.from({ length: ROWS }, (_, r) =>
     clients.filter((_, i) => i % ROWS === r),

@@ -1,8 +1,9 @@
 import { Link, useParams } from "react-router-dom";
 import BrochureCta from "../components/BrochureCta";
 import Reveal from "../components/Reveal";
-import { companyInfo, history, orgChart } from "../data/company";
+import { companyInfo } from "../data/company";
 import { asset } from "../lib/asset";
+import { useSiteContent } from "../lib/content";
 
 const TABS = [
   { key: "intro", label: "소개", path: "/about" },
@@ -63,6 +64,8 @@ export default function About() {
 /* ---------------------------------------------------------------- 소개 */
 
 function IntroTab() {
+  const { site } = useSiteContent();
+  const orgChart = site.org;
   return (
     <>
       <section className="about-section">
@@ -254,6 +257,8 @@ function Dot({ inverted = false }: { inverted?: boolean }) {
 /* ---------------------------------------------------------------- 연혁 */
 
 function HistoryTab() {
+  const { site } = useSiteContent();
+  const history = site.history;
   return (
     <section className="about-section">
       <div className="container">

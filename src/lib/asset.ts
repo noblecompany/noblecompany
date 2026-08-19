@@ -6,6 +6,8 @@
  * (로컬 dev·preview 에서는 BASE_URL이 "/" 라 결과가 동일하다.)
  */
 export function asset(path: string): string {
+  // Supabase Storage 등 절대 URL은 그대로 쓴다 (어드민에서 업로드한 이미지)
+  if (/^https?:\/\//.test(path)) return path;
   const base = import.meta.env.BASE_URL.replace(/\/$/, "");
   return base + (path.startsWith("/") ? path : `/${path}`);
 }

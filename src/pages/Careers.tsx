@@ -7,29 +7,30 @@ import {
   hiringProcess,
   isClosed,
   jobGroups,
-  jobPostings,
   RECRUIT_EMAIL,
   RECRUIT_TEL,
   type JobGroup,
 } from "../data/careers";
+import { useJobs } from "../lib/content";
 
 /** CAREERS — 채용공고 목록. 직군 필터 + 전형 절차 + 복리후생 */
 export default function Careers() {
   const [filter, setFilter] = useState<"ALL" | JobGroup>("ALL");
+  const { jobs } = useJobs();
 
   // 진행 중인 공고를 위로, 그 안에서는 마감 임박 순으로 정렬한다.
   const sorted = useMemo(() => {
-    return [...jobPostings].sort((a, b) => {
+    return [...jobs].sort((a, b) => {
       const closedDiff = Number(isClosed(a)) - Number(isClosed(b));
       if (closedDiff !== 0) return closedDiff;
       if (a.deadline && b.deadline) return a.deadline.localeCompare(b.deadline);
       // 상시채용은 마감일이 있는 공고 뒤에 둔다
       return a.deadline ? -1 : b.deadline ? 1 : 0;
     });
-  }, []);
+  }, [jobs]);
 
   const visible = filter === "ALL" ? sorted : sorted.filter((j) => j.group === filter);
-  const openCount = jobPostings.filter((j) => !isClosed(j)).length;
+  const openCount = jobs.filter((j) => !isClosed(j)).length;
 
   const tabs: { key: "ALL" | JobGroup; label: string }[] = [
     { key: "ALL", label: "ALL" },

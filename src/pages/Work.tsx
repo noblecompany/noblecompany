@@ -3,7 +3,8 @@ import { Link } from "react-router-dom";
 import Accordion from "../components/Accordion";
 import Reveal from "../components/Reveal";
 import WorkCard from "../components/WorkCard";
-import { workCategories, works, type WorkCategory } from "../data/works";
+import { workCategories, type WorkCategory } from "../data/works";
+import { useWorks } from "../lib/content";
 
 /** 기획안 p33 — 그리드는 3×3, 하단 페이지네이션으로 넘김 */
 const PER_PAGE = 9;
@@ -15,10 +16,11 @@ export default function Work() {
   /** p33 — 유형 전환 시 페이지 리로드가 아닌 슬라이드로 넘어가는 연출 */
   const [slide, setSlide] = useState<"in" | "out">("in");
   const firstRender = useRef(true);
+  const { works } = useWorks();
 
   const filtered = useMemo(
     () => (filter === "ALL" ? works : works.filter((w) => w.category === filter)),
-    [filter],
+    [filter, works],
   );
   const pageCount = Math.max(1, Math.ceil(filtered.length / PER_PAGE));
   const visible = filtered.slice(page * PER_PAGE, page * PER_PAGE + PER_PAGE);

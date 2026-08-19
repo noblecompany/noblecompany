@@ -1,33 +1,37 @@
+import { useState } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
+import ApplyModal from "../components/ApplyModal";
 import Reveal from "../components/Reveal";
-import {
-  deadlineLabel,
-  hiringProcess,
-  isClosed,
-  jobPostings,
-  RECRUIT_EMAIL,
-  type JobPosting,
-} from "../data/careers";
+import { deadlineLabel, hiringProcess, isClosed, RECRUIT_EMAIL } from "../data/careers";
+import { useJobs, useJobViewPing } from "../lib/content";
 
-/** 채용공고 상세 — 주요업무 / 자격요건 / 우대사항 / 전형절차 */
+/** 채용공고 상세 — 주요업무 / 자격요건 / 우대사항 / 전형절차 + 온라인 지원 (F2) */
 export default function CareerDetail() {
   const { id } = useParams<{ id: string }>();
-  const job = jobPostings.find((j) => j.id === id);
+  const { jobs, loading } = useJobs();
+  const [applying, setApplying] = useState(false);
 
-  if (!job) return <Navigate to="/careers" replace />;
+  // 상세 조회수 집계 (F11 간이 통계)
+  useJobViewPing(id);
+
+  const job = jobs.find((j) => j.id === id);
+
+  if (!job) {
+    // 목록을 아직 불러오는 중이면 판단을 미룬다 — 새로고침 직후 잘못된 리다이렉트 방지
+    if (loading) return <main style={{ minHeight: "60vh" }} />;
+    return <Navigate to="/careers" replace />;
+  }
 
   const closed = isClosed(job);
-  const at = jobPostings.findIndex((j) => j.id === job.id);
-  const prev = jobPostings[(at - 1 + jobPostings.length) % jobPostings.length];
-  const next = jobPostings[(at + 1) % jobPostings.length];
+  const at = jobs.findIndex((j) => j.id === job.id);
+  const prev = jobs[(at - 1 + jobs.length) % jobs.length];
+  const next = jobs[(at + 1) % jobs.length];
 
   const sections: { title: string; items: string[] }[] = [
     { title: "주요 업무", items: job.responsibilities },
     { title: "자격 요건", items: job.requirements },
     { title: "우대 사항", items: job.preferred },
   ].filter((s) => s.items.length > 0);
-
-  const applyHref = applyMailto(job);
 
   return (
     <main>
@@ -114,9 +118,9 @@ export default function CareerDetail() {
               <div>
                 <h3>지원 방법</h3>
                 <p>
-                  이력서·포트폴리오를 <b>{RECRUIT_EMAIL}</b> 로 보내주세요. 메일 제목은{" "}
-                  <b>[{job.title}] 지원자명</b> 형식으로 부탁드립니다.
-                  {/* TODO: 지원서 접수 백엔드(파일 업로드) 연동 시 온라인 지원 폼으로 교체 */}
+                  아래 버튼으로 이력서를 첨부해 바로 지원할 수 있습니다. 온라인 지원이 어려우면{" "}
+                  <b>{RECRUIT_EMAIL}</b> 로 <b>[{job.title}] 지원자명</b> 제목의 메일로 보내주셔도
+                  됩니다.
                 </p>
               </div>
               {closed ? (
@@ -124,9 +128,9 @@ export default function CareerDetail() {
                   접수 마감된 공고입니다
                 </span>
               ) : (
-                <a className="btn btn--primary" href={applyHref}>
+                <button type="button" className="btn btn--primary" onClick={() => setApplying(true)}>
                   이 공고에 지원하기
-                </a>
+                </button>
               )}
             </div>
           </Reveal>
@@ -150,21 +154,8 @@ export default function CareerDetail() {
           </Link>
         </div>
       </section>
+
+      {applying && <ApplyModal job={job} onClose={() => setApplying(false)} />}
     </main>
   );
-}
-
-/** 지원 메일 초안 — 접수 백엔드 도입 전까지 메일 클라이언트로 넘긴다 */
-function applyMailto(job: JobPosting): string {
-  const body = [
-    `지원 공고: ${job.title} (${job.team} / ${job.employment})`,
-    "지원자 성함:",
-    "연락처:",
-    "이메일:",
-    "",
-    "※ 이력서와 포트폴리오 파일을 첨부해 주세요.",
-  ].join("\n");
-  return `mailto:${RECRUIT_EMAIL}?subject=${encodeURIComponent(
-    `[${job.title}] 지원자명`,
-  )}&body=${encodeURIComponent(body)}`;
 }

@@ -2651,3 +2651,212 @@ img {
     gap: 14px 28px;
   }
 }
+
+/* ============================================================
+   채용 온라인 지원 모달 (F2)
+   ============================================================ */
+
+.apply-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 210;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.apply-modal__scrim {
+  position: absolute;
+  inset: 0;
+  background: rgba(5, 8, 12, 0.62);
+  backdrop-filter: blur(3px);
+}
+
+.apply-modal__panel {
+  position: relative;
+  width: min(680px, 100%);
+  max-height: min(88vh, 900px);
+  overflow-y: auto;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 28px 28px 32px;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
+}
+
+.apply-modal__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 22px;
+}
+
+.apply-modal__head h2 {
+  font-size: 24px;
+  font-weight: 800;
+  margin: 6px 0 4px;
+}
+
+.apply-modal__sub {
+  color: var(--text-dim);
+  font-size: 14px;
+}
+
+.apply-modal__close {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.apply-modal__close:hover {
+  background: var(--bg-soft);
+}
+
+.apply-modal__file {
+  display: block;
+  width: 100%;
+  font-size: 14px;
+  color: var(--text);
+  padding: 10px;
+  border: 1px dashed var(--line-strong);
+  border-radius: 10px;
+  background: var(--bg-soft);
+  cursor: pointer;
+}
+
+.apply-modal__hint {
+  margin-top: 6px;
+  font-size: 12.5px;
+  color: var(--text-dim);
+}
+
+.apply-modal__done {
+  display: grid;
+  gap: 14px;
+  justify-items: start;
+  padding: 18px 4px 6px;
+}
+
+.apply-modal__done strong {
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.apply-modal__done p {
+  color: var(--text-dim);
+  line-height: 1.7;
+}
+
+@media (max-width: 640px) {
+  .apply-modal {
+    padding: 0;
+    align-items: flex-end;
+  }
+
+  .apply-modal__panel {
+    border-radius: 18px 18px 0 0;
+    max-height: 92vh;
+  }
+}
+
+/* ============================================================
+   공지·팝업 배너 (C1)
+   ============================================================ */
+
+.site-popup {
+  position: fixed;
+  left: 20px;
+  bottom: 20px;
+  z-index: 190;
+  width: min(340px, calc(100vw - 40px));
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+}
+
+.site-popup__body img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.site-popup__title {
+  padding: 20px 18px;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.6;
+}
+
+.site-popup__foot {
+  display: flex;
+  border-top: 1px solid var(--line-soft);
+}
+
+.site-popup__foot button {
+  flex: 1;
+  padding: 11px 0;
+  font-size: 13px;
+  color: var(--text-dim);
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+}
+
+.site-popup__foot button + button {
+  border-left: 1px solid var(--line-soft);
+  font-weight: 700;
+  color: var(--text);
+}
+
+.site-popup__foot button:hover {
+  background: var(--bg-soft);
+}
+
+/* ============================================================
+   메인 FAQ — 자주묻는 질문
+   ============================================================ */
+
+.faq__head {
+  text-align: center;
+  margin-bottom: 44px;
+}
+
+.faq__head .section-title {
+  margin-bottom: 14px;
+}
+
+.faq__sub {
+  color: var(--text-dim);
+  font-size: 15px;
+}
+
+.faq__sub .accent {
+  font-weight: 700;
+}
+
+.faq__q {
+  font-style: normal;
+  font-weight: 800;
+  color: var(--accent-text);
+  margin-right: 10px;
+}
+
+.faq__answer p {
+  line-height: 1.75;
+}
+
+.faq__answer p + p {
+  margin-top: 10px;
+}

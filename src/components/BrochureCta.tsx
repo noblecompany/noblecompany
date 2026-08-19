@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { asset } from "../lib/asset";
 import { brochure, SALES_EMAIL } from "../data/company";
+import { countBrochure, useBrochureMeta } from "../lib/content";
 
 /** 소개서 파일이 아직 없을 때 쓰는 메일 요청 링크 */
 const REQUEST_HREF = `mailto:${SALES_EMAIL}?subject=${encodeURIComponent(
@@ -91,14 +92,17 @@ export default function BrochureCta({
   className?: string;
 }) {
   const [open, setOpen] = useState(false);
-  const ready = Boolean(brochure.file);
-  const fileUrl = ready ? asset(brochure.file as string) : "";
+  // 어드민에서 소개서를 교체하면(F13) API 가 최신본을 내려준다 — 없으면 정적 파일 폴백
+  const { meta } = useBrochureMeta();
+  const ready = Boolean(meta?.url ?? brochure.file);
+  const fileUrl = meta?.url ? asset(meta.url) : brochure.file ? asset(brochure.file) : "";
   const label = ready ? "회사소개서 보기" : "회사소개서 요청하기";
 
   const handleOpen = (e: React.MouseEvent) => {
     if (!ready) return; // 메일 요청은 기본 동작(mailto)에 맡긴다
     e.preventDefault();
     track("brochure_view");
+    countBrochure(meta?.id, "view");
 
     // 모바일 브라우저는 iframe 안에서 PDF를 제대로 렌더하지 못하는 경우가 많다
     if (window.matchMedia("(max-width: 768px)").matches) {
@@ -126,7 +130,9 @@ export default function BrochureCta({
       </a>
     );
 
-  const modal = open && <BrochureViewer url={fileUrl} onClose={() => setOpen(false)} />;
+  const modal = open && (
+    <BrochureViewer url={fileUrl} brochureId={meta?.id} onClose={() => setOpen(false)} />
+  );
 
   if (variant !== "card") {
     return (
@@ -160,7 +166,15 @@ export default function BrochureCta({
 }
 
 /** 사이트 안에서 PDF를 미리 보여주는 모달 */
-function BrochureViewer({ url, onClose }: { url: string; onClose: () => void }) {
+function BrochureViewer({
+  url,
+  brochureId,
+  onClose,
+}: {
+  url: string;
+  brochureId?: string;
+  onClose: () => void;
+}) {
   const panelRef = useRef<HTMLDivElement>(null);
   const [isFull, setIsFull] = useState(false);
   /**
@@ -261,7 +275,10 @@ function BrochureViewer({ url, onClose }: { url: string; onClose: () => void }) 
               className="brochure-modal__btn"
               href={url}
               download={brochure.downloadName}
-              onClick={() => track("brochure_download")}
+              onClick={() => {
+                track("brochure_download");
+                countBrochure(brochureId, "download");
+              }}
             >
               <DownloadIcon />
               다운로드
