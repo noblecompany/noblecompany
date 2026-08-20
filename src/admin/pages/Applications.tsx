@@ -10,6 +10,7 @@ import {
   type Application,
   type ApplicationStatus,
 } from "../api";
+import { IconClip, IconX } from "../../components/Icons";
 
 const STATUS_FILTERS: Array<"ALL" | ApplicationStatus> = [
   "ALL",
@@ -144,7 +145,7 @@ export default function Applications() {
                   </td>
                   <td className="adm-dim">{r.postingTitle}</td>
                   <td className="adm-dim">{r.careerYears ?? "—"}</td>
-                  <td className="adm-dim">{r.hasResume ? "📎 첨부" : "—"}</td>
+                  <td className="adm-dim">{r.hasResume ? (<span className="adm-ico-label"><IconClip /> 첨부</span>) : "—"}</td>
                   <td>
                     <span className={`adm-badge adm-badge--app-${r.status}`}>
                       {APPLICATION_STATUS_LABEL[r.status]}
@@ -232,7 +233,7 @@ function DetailPanel({
             </p>
           </div>
           <button type="button" className="adm-iconbtn" onClick={onClose} aria-label="닫기">
-            ✕
+            <IconX size={18} />
           </button>
         </header>
 
@@ -293,7 +294,7 @@ function DetailPanel({
                   disabled={resumeBusy}
                   title="60초 유효 링크로 열립니다 · 열람 기록이 남습니다"
                 >
-                  📎 {resumeBusy ? "링크 발급 중…" : "이력서 열기 (열람 기록 남음)"}
+                  <IconClip /> {resumeBusy ? "링크 발급 중…" : "이력서 열기 (열람 기록 남음)"}
                 </button>
               ) : (
                 "미첨부"

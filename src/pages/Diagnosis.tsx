@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import { ActionButton } from "seed-design/ui/action-button";
+import { IconLock } from "../components/Icons";
 import Reveal from "../components/Reveal";
 import { useSeo } from "../lib/seo";
 
@@ -242,7 +243,9 @@ export default function Diagnosis() {
                     ))}
                   </ul>
                   <div className="diag-lockbox__overlay">
-                    <b>🔒 상세 리포트 잠김</b>
+                    <b>
+                      <IconLock className="diag-lockbox__icon" /> 상세 리포트 잠김
+                    </b>
                     <p>
                       항목별 진단 결과·키워드 분석·개선 방안은
                       <br />

@@ -9,6 +9,7 @@ import {
   type Inquiry,
   type InquiryStatus,
 } from "../api";
+import { IconX } from "../../components/Icons";
 
 const STATUS_FILTERS: Array<"ALL" | InquiryStatus> = [
   "ALL",
@@ -228,7 +229,7 @@ function DetailPanel({
             </p>
           </div>
           <button type="button" className="adm-iconbtn" onClick={onClose} aria-label="닫기">
-            ✕
+            <IconX size={18} />
           </button>
         </header>
 

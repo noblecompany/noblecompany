@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { adminApi, formatDate, JOB_STATUS_LABEL, type AdminJob } from "../api";
+import { IconX } from "../../components/Icons";
 
 const GROUPS = ["기획", "퍼포먼스", "콘텐츠", "바이럴", "경영지원"];
 const EMPLOYMENTS = ["정규직", "계약직", "인턴"];
@@ -235,7 +236,7 @@ function Editor({
             )}
           </div>
           <button type="button" className="adm-iconbtn" onClick={onClose} aria-label="닫기">
-            ✕
+            <IconX size={18} />
           </button>
         </header>
 

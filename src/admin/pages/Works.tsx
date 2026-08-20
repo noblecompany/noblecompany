@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { adminApi, adminUpload, imageExt, resizeImage, type AdminWork } from "../api";
+import { IconX } from "../../components/Icons";
 
 const CATEGORIES: AdminWork["category"][] = ["IMC", "SA", "DA", "VIRAL"];
 
@@ -271,7 +272,7 @@ function Editor({
             <h2>{isNew ? "포트폴리오 등록" : f.client}</h2>
           </div>
           <button type="button" className="adm-iconbtn" onClick={onClose} aria-label="닫기">
-            ✕
+            <IconX size={18} />
           </button>
         </header>
 

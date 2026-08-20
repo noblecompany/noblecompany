@@ -1868,3 +1868,19 @@
     grid-template-columns: 92px 1fr 52px 36px;
   }
 }
+
+/* SVG 아이콘 정렬 (이모지 대체) */
+.adm-ico-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.adm-ico-ok { color: #2e9e5b; }
+.adm-ico-no { color: #d64545; }
+
+.adm-table td svg,
+.adm-linkbtn svg,
+.adm-clientchip svg {
+  vertical-align: -2px;
+}

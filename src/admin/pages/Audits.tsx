@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { adminApi, formatDate, timeAgo } from "../api";
+import { IconCheck, IconMinus, IconX } from "../../components/Icons";
 
 type Status = "pass" | "warn" | "fail";
 
@@ -213,7 +214,7 @@ function DetailDrawer({ audit: a, onClose }: { audit: AuditDetail; onClose: () =
               인쇄 / PDF
             </button>
             <button type="button" className="adm-iconbtn" onClick={onClose} aria-label="닫기">
-              ✕
+              <IconX size={18} />
             </button>
           </div>
         </header>
@@ -265,7 +266,7 @@ function DetailDrawer({ audit: a, onClose }: { audit: AuditDetail; onClose: () =
                       f.status === "pass" ? "#2e9e5b" : f.status === "missing" ? "#d64545" : undefined,
                   }}
                 >
-                  {f.status === "pass" ? "✓" : f.status === "missing" ? "✕" : "—"} {f.label}
+                  {f.status === "pass" ? <IconCheck /> : f.status === "missing" ? <IconX /> : <IconMinus />} {f.label}
                 </span>
               ))}
             </div>
@@ -318,8 +319,8 @@ function DetailDrawer({ audit: a, onClose }: { audit: AuditDetail; onClose: () =
                   </td>
                   <td className="adm-right">{k.count}</td>
                   <td className="adm-right">{k.rate}%</td>
-                  <td>{k.inTitle ? "✅" : "❌"}</td>
-                  <td>{k.inDesc ? "✅" : "❌"}</td>
+                  <td>{k.inTitle ? <IconCheck className="adm-ico-ok" /> : <IconX className="adm-ico-no" />}</td>
+                  <td>{k.inDesc ? <IconCheck className="adm-ico-ok" /> : <IconX className="adm-ico-no" />}</td>
                 </tr>
               ))}
             </tbody>

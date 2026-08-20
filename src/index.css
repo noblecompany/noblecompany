@@ -3304,3 +3304,8 @@ img {
   color: var(--text-dim);
   line-height: 1.7;
 }
+
+.diag-lockbox__icon {
+  vertical-align: -3px;
+  margin-right: 4px;
+}
