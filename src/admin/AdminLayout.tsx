@@ -36,10 +36,14 @@ export default function AdminLayout({
   const { theme, toggle } = useTheme();
   const { pathname } = useLocation();
   const title = TITLE[pathname] ?? "대시보드";
+  // 모바일 햄버거 드로어 — 페이지 이동 시 자동으로 닫는다
+  const [menuOpen, setMenuOpen] = useState(false);
+  useEffect(() => setMenuOpen(false), [pathname]);
 
   return (
     <div className="adm">
-      <aside className="adm-side">
+      {menuOpen && <div className="adm-side-scrim" onClick={() => setMenuOpen(false)} />}
+      <aside className={`adm-side ${menuOpen ? "is-open" : ""}`}>
         <Link to="/admin" className="adm-side__brand">
           noble<b>.</b>admin
         </Link>
@@ -67,6 +71,19 @@ export default function AdminLayout({
 
       <div className="adm-main">
         <header className="adm-top">
+          <button
+            type="button"
+            className="adm-burger"
+            onClick={() => setMenuOpen(true)}
+            aria-label="관리 메뉴 열기"
+            aria-expanded={menuOpen}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+              <line x1="4" y1="7" x2="20" y2="7" />
+              <line x1="4" y1="12" x2="20" y2="12" />
+              <line x1="4" y1="17" x2="20" y2="17" />
+            </svg>
+          </button>
           <div className="adm-top__crumb">
             <span>관리자</span>
             <i aria-hidden="true">/</i>

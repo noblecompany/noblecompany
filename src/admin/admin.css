@@ -300,6 +300,25 @@
   gap: 20px;
 }
 
+/* 모바일 전용 컨트롤 — 데스크톱에서는 숨김 */
+.adm-burger,
+.adm-side-scrim {
+  display: none;
+}
+
+.adm-burger {
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  flex: 0 0 auto;
+}
+
 /* ---------- 알림센터 ---------- */
 .adm-bell {
   position: relative;
@@ -1387,61 +1406,39 @@
    ============================================================ */
 
 @media (max-width: 860px) {
-  /* 사이드바 → 하단 탭 바 */
+  /* 사이드바 → 햄버거 드로어 (좌측 오프캔버스) */
   .adm-side {
     position: fixed;
-    top: auto;
+    top: 0;
     bottom: 0;
     left: 0;
-    right: 0;
-    width: 100%;
-    height: auto;
-    z-index: 50;
-    flex-direction: row;
-    align-items: center;
-    padding: 6px 6px calc(6px + env(safe-area-inset-bottom));
-    border-right: 0;
-    border-top: 1px solid var(--line);
-    box-shadow: 0 -6px 24px rgba(0, 0, 0, 0.12);
+    height: 100dvh;
+    width: 254px;
+    z-index: 70;
+    transform: translateX(-105%);
+    transition: transform 0.25s ease;
+    box-shadow: 18px 0 48px rgba(0, 0, 0, 0.25);
   }
 
-  .adm-side__brand,
-  .adm-side__foot {
-    display: none;
+  .adm-side.is-open {
+    transform: translateX(0);
   }
 
-  .adm-side__nav {
-    flex-direction: row;
-    width: 100%;
-    gap: 0;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
+  /* 드로어 뒤 스크림 */
+  .adm-side-scrim {
+    position: fixed;
+    inset: 0;
+    z-index: 65;
+    background: rgba(6, 8, 11, 0.45);
   }
 
-  .adm-side__nav::-webkit-scrollbar {
-    display: none;
+  /* 상단 바 햄버거 버튼 */
+  .adm-burger {
+    display: inline-flex;
   }
 
-  .adm-side__item {
-    flex: 1 0 auto;
-    min-width: 60px;
-    flex-direction: column;
-    gap: 4px;
-    padding: 7px 5px;
-    font-size: 10.5px;
-    text-align: center;
-    border-radius: 9px;
-  }
-
-  .adm-side__item svg {
-    width: 20px;
-    height: 20px;
-  }
-
-  /* 본문 — 하단 탭 바 높이만큼 여백 확보 */
   .adm-content {
-    padding: 16px 14px calc(88px + env(safe-area-inset-bottom));
+    padding: 16px 14px calc(36px + env(safe-area-inset-bottom));
     gap: 14px;
   }
 
