@@ -1380,3 +1380,175 @@
   color: var(--text-dim);
   text-align: center;
 }
+
+/* ============================================================
+   모바일 대응 — 사이드바를 앱 스타일 하단 탭 바로 전환
+   (홈 화면 추가 시 standalone 앱처럼 쓰는 것을 전제)
+   ============================================================ */
+
+@media (max-width: 860px) {
+  /* 사이드바 → 하단 탭 바 */
+  .adm-side {
+    position: fixed;
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: auto;
+    z-index: 50;
+    flex-direction: row;
+    align-items: center;
+    padding: 6px 6px calc(6px + env(safe-area-inset-bottom));
+    border-right: 0;
+    border-top: 1px solid var(--line);
+    box-shadow: 0 -6px 24px rgba(0, 0, 0, 0.12);
+  }
+
+  .adm-side__brand,
+  .adm-side__foot {
+    display: none;
+  }
+
+  .adm-side__nav {
+    flex-direction: row;
+    width: 100%;
+    gap: 0;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .adm-side__nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .adm-side__item {
+    flex: 1 0 auto;
+    min-width: 60px;
+    flex-direction: column;
+    gap: 4px;
+    padding: 7px 5px;
+    font-size: 10.5px;
+    text-align: center;
+    border-radius: 9px;
+  }
+
+  .adm-side__item svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  /* 본문 — 하단 탭 바 높이만큼 여백 확보 */
+  .adm-content {
+    padding: 16px 14px calc(88px + env(safe-area-inset-bottom));
+    gap: 14px;
+  }
+
+  .adm-top {
+    padding: 10px 14px;
+  }
+
+  /* 대시보드 */
+  .adm-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .adm-stat {
+    padding: 15px 16px;
+  }
+
+  .adm-stat strong {
+    font-size: 24px;
+  }
+
+  .adm-grid2 {
+    grid-template-columns: 1fr;
+  }
+
+  /* 표 — 좁은 화면에서는 패널 안에서 가로 스크롤 */
+  .adm-panel {
+    overflow-x: auto;
+  }
+
+  .adm-table--rows {
+    min-width: 620px;
+  }
+
+  /* 툴바 — 검색·버튼 줄바꿈 시 전체 폭 사용 */
+  .adm-toolbar__right {
+    width: 100%;
+  }
+
+  .adm-toolbar__right .adm-search {
+    flex: 1;
+    width: auto;
+  }
+
+  /* 상세 드로어 — 전체 화면 */
+  .adm-drawer__panel,
+  .adm-drawer__panel--wide {
+    width: 100vw;
+    border-left: 0;
+    padding: 18px 16px calc(28px + env(safe-area-inset-bottom));
+  }
+
+  /* 알림 패널 — 화면 폭에 맞춤 */
+  .adm-bell__panel {
+    position: fixed;
+    left: 10px;
+    right: 10px;
+    top: 54px;
+    width: auto;
+  }
+
+  /* 편집 폼 */
+  .adm-formgrid {
+    grid-template-columns: 1fr;
+  }
+
+  .adm-imgpick {
+    flex-direction: column;
+  }
+
+  .adm-imgpick__preview {
+    width: 100%;
+  }
+
+  /* 연혁 행 편집 — 가로 스크롤 유지 */
+  .adm-rowlist {
+    overflow-x: auto;
+    padding-bottom: 6px;
+  }
+
+  .adm-rowlist__grid-history {
+    grid-template-columns: 96px 62px 96px minmax(220px, 1fr) 118px;
+    min-width: 620px;
+  }
+
+  .adm-orggrid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .adm-actionbar {
+    position: sticky;
+    bottom: 0;
+    background: var(--surface);
+    padding-bottom: 4px;
+  }
+
+  .adm-actionbar .adm-btn {
+    flex: 1;
+  }
+}
+
+@media (max-width: 480px) {
+  .adm-orggrid {
+    grid-template-columns: 1fr;
+  }
+
+  .adm-chart {
+    gap: 6px;
+  }
+}

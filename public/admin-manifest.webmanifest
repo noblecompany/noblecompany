@@ -1,0 +1,25 @@
+{
+  "name": "노블컴퍼니 관리자",
+  "short_name": "noble.admin",
+  "description": "노블컴퍼니 홈페이지 관리자 콘솔 — 문의·채용·포트폴리오·사이트 콘텐츠 관리",
+  "start_url": "/admin",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0b0d10",
+  "theme_color": "#2e80e8",
+  "icons": [
+    {
+      "src": "/admin-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/admin-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

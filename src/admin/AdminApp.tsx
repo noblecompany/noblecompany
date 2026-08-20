@@ -21,6 +21,26 @@ export default function AdminApp() {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // 어드민 진입 시에만 PWA 매니페스트를 주입 — '홈 화면에 추가'하면
+  // noble.admin 이름의 standalone 앱으로 설치된다 (공개 사이트에는 미적용).
+  useEffect(() => {
+    if (document.querySelector('link[rel="manifest"]')) return;
+    const link = document.createElement("link");
+    link.rel = "manifest";
+    link.href = "/admin-manifest.webmanifest";
+    document.head.appendChild(link);
+
+    const meta = document.createElement("meta");
+    meta.name = "apple-mobile-web-app-capable";
+    meta.content = "yes";
+    document.head.appendChild(meta);
+
+    const title = document.createElement("meta");
+    title.name = "apple-mobile-web-app-title";
+    title.content = "noble.admin";
+    document.head.appendChild(title);
+  }, []);
+
   useEffect(() => {
     if (!supabase) {
       setLoading(false);

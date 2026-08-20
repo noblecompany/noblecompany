@@ -6,8 +6,8 @@ import WorkCard from "../components/WorkCard";
 import { workCategories, type WorkCategory } from "../data/works";
 import { useWorks } from "../lib/content";
 
-/** 기획안 p33 — 그리드는 3×3, 하단 페이지네이션으로 넘김 */
-const PER_PAGE = 9;
+/** 그리드는 4×3 (썸네일 원본 폭 300px에 맞춰 4열 — 확대로 인한 화질 저하 방지) */
+const PER_PAGE = 12;
 
 /** 슬라이드 30~34 — WORK 메인: 유형 필터 + 그리드 + 하단 아코디언 */
 export default function Work() {
@@ -73,7 +73,7 @@ export default function Work() {
 
           <div className={`work-grid work-grid--${slide}`}>
             {visible.map((work, i) => (
-              <Reveal key={work.id} delay={(i % 3) * 90}>
+              <Reveal key={work.id} delay={(i % 4) * 80}>
                 <WorkCard work={work} />
               </Reveal>
             ))}
