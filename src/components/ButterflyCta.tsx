@@ -1,36 +1,20 @@
-import { useEffect, useRef, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { useState } from "react";
+import { Link } from "react-router-dom";
 
 /**
  * 우측 하단 플로팅 퀵메뉴.
- * - PC: 나비 버튼을 누르면 'AEO 무료진단'(위)·'문의하기'(좌) 두 메뉴가
- *   버튼을 축으로 궤도를 그리며 펼쳐진다 (자전 모션).
+ * - PC: 기본 펼침 상태로 'AEO 무료진단'(위)·'문의하기'(좌)가 노출되고,
+ *   나비 버튼으로 접었다 펼 수 있다 (버튼 축 자전 모션).
  * - 모바일: 토글 없이 두 개의 버튼으로 상시 노출.
  */
 export default function ButterflyCta() {
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-  const { pathname } = useLocation();
-
-  // 페이지 이동 시 접기
-  useEffect(() => setOpen(false), [pathname]);
-
-  // 바깥 클릭 시 접기
-  useEffect(() => {
-    if (!open) return;
-    const onDown = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
-    };
-    document.addEventListener("mousedown", onDown);
-    return () => document.removeEventListener("mousedown", onDown);
-  }, [open]);
+  const [open, setOpen] = useState(true);
 
   return (
-    <div className={`qmenu ${open ? "is-open" : ""}`} ref={ref}>
+    <div className={`qmenu ${open ? "is-open" : ""}`}>
       <Link
         to="/diagnosis"
         className="qmenu__item qmenu__item--diag"
-        onClick={() => setOpen(false)}
         tabIndex={open ? 0 : undefined}
       >
         <SearchIcon />
@@ -40,7 +24,6 @@ export default function ButterflyCta() {
       <Link
         to="/contact"
         className="qmenu__item qmenu__item--contact"
-        onClick={() => setOpen(false)}
         tabIndex={open ? 0 : undefined}
       >
         <MailIcon />
