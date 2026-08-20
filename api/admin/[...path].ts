@@ -22,7 +22,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const user = await requireAdmin(req, db);
   if (!user) return fail(res, "unauthorized", "로그인이 필요합니다.", 401);
 
-  const segs = ([] as string[]).concat((req.query.path as string[] | string) ?? []);
+  // 경로 세그먼트 — Vercel 이 catch-all 파라미터를 넘기는 형태(문자열/배열)가
+  // 환경마다 달라서, URL 자체에서 /api/admin 이후를 직접 파싱한다.
+  const pathname = (req.url ?? "").split("?")[0];
+  let segs = pathname
+    .replace(/^\/api\/admin\/?/, "")
+    .split("/")
+    .filter(Boolean)
+    .map(decodeURIComponent);
+  if (segs.length === 0) {
+    segs = ([] as string[]).concat((req.query.path as string[] | string) ?? []);
+  }
   const [resource, id, sub] = segs;
   const ctx: Ctx = { req, res, db, user };
 
