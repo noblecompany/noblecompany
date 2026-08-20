@@ -8,9 +8,9 @@ import {
   maskPhone,
   requireAdmin,
   type AdminUser,
-} from "../_lib/auth.js";
-import { adminDb } from "../_lib/db.js";
-import { fail, ok } from "../_lib/http.js";
+} from "./_lib/auth.js";
+import { adminDb } from "./_lib/db.js";
+import { fail, ok } from "./_lib/http.js";
 
 /**
  * 어드민 API 전체를 하나의 서버리스 함수로 라우팅한다 (설계 §5 어드민 API).
