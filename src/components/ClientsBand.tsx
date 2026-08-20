@@ -2,18 +2,23 @@ import Reveal from "./Reveal";
 import { useSiteContent } from "../lib/content";
 
 /**
- * 기획안 슬라이드 9 — Clients.
- * 레퍼런스는 클라이언트 로고 그리드지만 로고 원본이 아직 없어,
- * 확보 전까지 브랜드명 롤링으로 동일한 "거래 폭" 신뢰 메시지를 전달한다.
- * 목록은 어드민(클라이언트 관리)에서 편집한다 — API 미연결 시 하드코딩 폴백.
+ * 기획안 슬라이드 9 — Clients 롤링 밴드.
+ * 로고 원본 확보 전까지 브랜드명 칩 롤링으로 "거래 폭" 신뢰 메시지를 전달한다.
+ * 목록은 어드민(연혁·조직 > 클라이언트)에서, 노출 여부는
+ * 어드민(사이트 설정 > 기능 토글 > 클라이언트 롤링 밴드)에서 제어한다.
  */
 const ROWS = 3;
 
 export default function ClientsBand() {
   const { site } = useSiteContent();
-  const clients = site.clients;
 
-  // 브랜드를 3줄로 나눠 줄마다 반대 방향으로 흐르게 한다
+  // 기능 토글이 켜져 있을 때만 노출 (기본 꺼짐)
+  if (site.settings["feature.clients"] !== true) return null;
+
+  const clients = site.clients;
+  if (clients.length === 0) return null;
+
+  // 브랜드를 3줄로 나눠 줄마다 반대 방향·다른 속도로 흐르게 한다
   const lines = Array.from({ length: ROWS }, (_, r) =>
     clients.filter((_, i) => i % ROWS === r),
   );
@@ -38,8 +43,9 @@ export default function ClientsBand() {
           <div className="clients__marquee" key={r}>
             <div
               className={`clients__track ${r % 2 ? "is-reverse" : ""}`}
-              style={{ animationDuration: `${52 + r * 9}s` }}
+              style={{ animationDuration: `${46 + r * 8}s` }}
             >
+              {/* 끊김 없는 무한 롤링을 위해 같은 줄을 2번 이어 붙인다 */}
               {[...line, ...line].map((name, i) => (
                 <span className="clients__chip" key={`${name}-${i}`} aria-hidden={i >= line.length}>
                   {name}

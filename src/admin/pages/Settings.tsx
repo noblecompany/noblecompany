@@ -46,6 +46,7 @@ function FeatureToggles() {
 
   const FEATURES: Array<{ key: string; label: string; desc: string }> = [
     { key: "feature.popup", label: "공지·팝업 배너", desc: "켜면 게시 기간 중인 팝업이 사이트에 노출됩니다" },
+    { key: "feature.clients", label: "클라이언트 롤링 밴드", desc: "메인 페이지에 거래 브랜드 롤링 섹션을 노출합니다 (목록은 연혁·조직 > 클라이언트에서 편집)" },
     { key: "feature.stats", label: "접속 통계", desc: "공고 조회수·소개서 열람 집계를 대시보드에 표시합니다" },
   ];
 

@@ -3309,3 +3309,106 @@ img {
   vertical-align: -3px;
   margin-right: 4px;
 }
+
+/* ============================================================
+   클라이언트 롤링 밴드 (메인 — 어드민 토글 feature.clients)
+   ============================================================ */
+
+.clients {
+  overflow: hidden;
+  padding-bottom: 90px;
+}
+
+.clients .section-title,
+.clients .section-desc {
+  text-align: center;
+}
+
+.clients .section-desc {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.clients__rows {
+  margin-top: 46px;
+  display: grid;
+  gap: 16px;
+}
+
+.clients__marquee {
+  overflow: hidden;
+  /* 양 끝을 자연스럽게 사라지게 하는 페이드 마스크 */
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+
+.clients__track {
+  display: flex;
+  gap: 12px;
+  width: max-content;
+  padding: 2px 0;
+  animation: clients-roll linear infinite;
+}
+
+.clients__track.is-reverse {
+  animation-direction: reverse;
+}
+
+/* 같은 줄을 2번 이어 붙였으므로 -50% 지점이 정확히 한 바퀴 */
+@keyframes clients-roll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.clients__chip {
+  flex: 0 0 auto;
+  padding: 11px 22px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--text-dim);
+  font-size: 15px;
+  font-weight: 700;
+  white-space: nowrap;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.clients__chip:hover {
+  color: var(--accent-text);
+  border-color: var(--noble-blue);
+}
+
+/* 모션 최소화 설정 사용자는 롤링 대신 정적 랩핑으로 */
+@media (prefers-reduced-motion: reduce) {
+  .clients__track {
+    animation: none;
+    flex-wrap: wrap;
+    width: auto;
+    justify-content: center;
+  }
+
+  .clients__track [aria-hidden="true"] {
+    display: none;
+  }
+
+  .clients__marquee {
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .clients__chip {
+    padding: 9px 16px;
+    font-size: 13.5px;
+  }
+
+  .clients__rows {
+    margin-top: 34px;
+    gap: 10px;
+  }
+}

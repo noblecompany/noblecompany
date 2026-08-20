@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Accordion from "../components/Accordion";
+import ClientsBand from "../components/ClientsBand";
 import PortfolioScroll from "../components/PortfolioScroll";
 import Reveal from "../components/Reveal";
 import { FAQ } from "../data/faq";
@@ -197,6 +198,9 @@ export default function Home() {
 
       {/* 3. 대표 포트폴리오 — 좌측 고정 텍스트 + 우측 스크롤 연동 그리드 (슬라이드 8, PLAY.D 레퍼런스) */}
       <PortfolioScroll />
+
+      {/* 3.5 클라이언트 롤링 밴드 — 어드민 '기능 토글'이 켜져 있을 때만 노출 */}
+      <ClientsBand />
 
       {/* 4. 성과/권위 증명 — 슬라이드 10~11 */}
       <section className="section" style={{ background: "var(--noble-black-soft)" }}>
