@@ -847,6 +847,7 @@ img {
   font-size: clamp(19px, 1.9vw, 27px);
   letter-spacing: -0.03em;
   word-break: keep-all;
+  color: var(--accent-text); /* 숫자·단위(원/+) 모두 노블 블루로 통일 */
 }
 
 .stats--figures .stat strong em {
