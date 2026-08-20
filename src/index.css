@@ -488,11 +488,67 @@ img {
 }
 
 /* ===== 나비 플로팅 CTA ===== */
-.butterfly-cta {
+/* ===== 플로팅 퀵메뉴 (나비 버튼 축 궤도 펼침) ===== */
+.qmenu {
   position: fixed;
   right: 28px;
   bottom: 28px;
   z-index: 90;
+}
+
+/* 펼쳐지는 메뉴 — 나비 버튼 중심을 축으로 회전하며 제자리로 (자전 모션) */
+.qmenu__item {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 11px 18px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 800;
+  white-space: nowrap;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.28);
+  opacity: 0;
+  pointer-events: none;
+  transform-origin: calc(100% - 31px) calc(100% - 31px);
+  transform: rotate(75deg) translate(var(--qx), var(--qy)) rotate(-75deg) scale(0.4);
+  transition: transform 0.45s cubic-bezier(0.22, 1.1, 0.32, 1.15), opacity 0.3s ease;
+}
+
+.qmenu__item--diag {
+  --qx: -14px;
+  --qy: -80px;
+  background: var(--noble-blue);
+  border-color: var(--noble-blue);
+  color: var(--on-accent);
+}
+
+.qmenu__item--contact {
+  --qx: -86px;
+  --qy: -16px;
+  transition-delay: 0.05s;
+}
+
+.qmenu.is-open .qmenu__item {
+  opacity: 1;
+  pointer-events: auto;
+  transform: rotate(0deg) translate(var(--qx), var(--qy)) rotate(0deg) scale(1);
+}
+
+.qmenu__item:hover {
+  filter: brightness(1.08);
+}
+
+.qmenu__fab {
+  position: relative;
+  z-index: 1;
+  border: 0;
+  cursor: pointer;
   width: 62px;
   height: 62px;
   border-radius: 50%;
@@ -505,14 +561,19 @@ img {
   animation: butterfly-float 3.2s ease-in-out infinite;
 }
 
-.butterfly-cta:hover {
-  transform: scale(1.1);
+.qmenu__fab:hover {
   background: var(--noble-blue-bright);
 }
 
-.butterfly-cta svg {
+.qmenu__fab svg {
   width: 30px;
   height: 30px;
+  transition: transform 0.45s cubic-bezier(0.22, 1.1, 0.32, 1.15);
+}
+
+/* 열림 상태 — 나비가 함께 자전 */
+.qmenu.is-open .qmenu__fab svg {
+  transform: rotate(130deg) scale(0.92);
 }
 
 @keyframes butterfly-float {
@@ -2677,11 +2738,29 @@ img {
     padding: 24px 20px;
   }
 
-  .butterfly-cta {
-    right: 18px;
-    bottom: 18px;
-    width: 54px;
-    height: 54px;
+  /* 모바일: 나비 토글 없이 버튼 두 개를 상시 노출 */
+  .qmenu {
+    right: 14px;
+    bottom: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 9px;
+  }
+
+  .qmenu__fab {
+    display: none;
+  }
+
+  .qmenu__item {
+    position: static;
+    opacity: 1;
+    pointer-events: auto;
+    transform: none;
+    transition: none;
+    padding: 11px 16px;
+    font-size: 13.5px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
   }
 
   /* 모바일은 카피가 화면 폭을 거의 다 쓰므로 좌측 집중 그라디언트가 안 먹는다.
