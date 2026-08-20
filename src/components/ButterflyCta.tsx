@@ -15,13 +15,6 @@ export default function ButterflyCta() {
         AEO 무료진단
       </Link>
 
-      <Link to="/contact" className="qdock__item">
-        <span className="qdock__ico">
-          <MailIcon />
-        </span>
-        문의하기
-      </Link>
-
       <a
         href={DESIGN_PORTFOLIO_URL}
         target="_blank"
@@ -34,6 +27,13 @@ export default function ButterflyCta() {
         디자인 포트폴리오
         <ArrowIcon />
       </a>
+
+      <Link to="/contact" className="qdock__item">
+        <span className="qdock__ico">
+          <MailIcon />
+        </span>
+        문의하기
+      </Link>
     </nav>
   );
 }
