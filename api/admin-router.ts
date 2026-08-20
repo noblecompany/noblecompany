@@ -22,16 +22,23 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const user = await requireAdmin(req, db);
   if (!user) return fail(res, "unauthorized", "로그인이 필요합니다.", 401);
 
-  // 경로 세그먼트 — Vercel 이 catch-all 파라미터를 넘기는 형태(문자열/배열)가
-  // 환경마다 달라서, URL 자체에서 /api/admin 이후를 직접 파싱한다.
-  const pathname = (req.url ?? "").split("?")[0];
-  let segs = pathname
-    .replace(/^\/api\/admin\/?/, "")
-    .split("/")
+  // 경로 세그먼트 — /api/admin/* 요청은 vercel.json rewrite 가 이 함수로 넘기며
+  // 원래 경로를 ?path=a/b/c 쿼리로 전달한다 (Vercel catch-all 이 2단계 이상
+  // 경로를 매칭하지 못해 함수 파일 + rewrite 조합으로 라우팅한다).
+  const rawPath = req.query.path;
+  let segs = ([] as string[])
+    .concat(rawPath ?? [])
+    .flatMap((s) => s.split("/"))
     .filter(Boolean)
     .map(decodeURIComponent);
   if (segs.length === 0) {
-    segs = ([] as string[]).concat((req.query.path as string[] | string) ?? []);
+    // rewrite 없이 직접 호출된 경우 — URL 에서 추출
+    const pathname = (req.url ?? "").split("?")[0];
+    segs = pathname
+      .replace(/^\/api\/(admin-router|admin)\/?/, "")
+      .split("/")
+      .filter(Boolean)
+      .map(decodeURIComponent);
   }
   const [resource, id, sub] = segs;
   const ctx: Ctx = { req, res, db, user };
@@ -64,6 +71,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return await settings(ctx);
       case "stats":
         return await stats(ctx);
+      case "visits":
+        return await visits(ctx);
       case "uploads":
         return await uploads(ctx);
       case "audits":
@@ -750,6 +759,39 @@ async function stats({ req, res, db, user }: Ctx) {
     })),
     totalInquiries: inqCount.count ?? 0,
     totalApplications: appCount.count ?? 0,
+  });
+}
+
+/* ================================================= 접속 통계 (C2 — 일별·기간별·포털별) */
+
+async function visits({ req, res, db, user }: Ctx) {
+  if (req.method !== "GET") return methodNa(res);
+  if (!hasRole(user, ["sales", "hr", "editor"])) return forbidden(res);
+
+  const Q = z.object({
+    from: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+    to: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  });
+  const p = Q.safeParse(req.query);
+  if (!p.success) return badBody(res);
+  const { from, to } = p.data;
+  const spanDays = (Date.parse(to) - Date.parse(from)) / 86400000;
+  if (!(spanDays >= 0 && spanDays <= 366)) return badBody(res);
+
+  const [daily, refs] = await Promise.all([
+    db.rpc("stats_visits_daily", { from_day: from, to_day: to }),
+    db.rpc("stats_visits_referrers", { from_day: from, to_day: to }),
+  ]);
+  const err = daily.error ?? refs.error;
+  if (err) return fail(res, "db_error", err.message, 500);
+
+  return ok(res, {
+    daily: ((daily.data ?? []) as { day: string; visitors: number; pageviews: number }[]).map(
+      (r) => ({ day: r.day, visitors: Number(r.visitors), pageviews: Number(r.pageviews) }),
+    ),
+    referrers: ((refs.data ?? []) as { ref_group: string; visitors: number; pageviews: number }[]).map(
+      (r) => ({ group: r.ref_group, visitors: Number(r.visitors), pageviews: Number(r.pageviews) }),
+    ),
   });
 }
 

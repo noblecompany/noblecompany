@@ -10,6 +10,7 @@ import Inquiries from "./pages/Inquiries";
 import Jobs from "./pages/Jobs";
 import Settings from "./pages/Settings";
 import SiteContent from "./pages/SiteContent";
+import Visits from "./pages/Visits";
 import Works from "./pages/Works";
 import "./admin.css";
 
@@ -69,6 +70,7 @@ export default function AdminApp() {
         <Route path="/jobs" element={<Jobs />} />
         <Route path="/works" element={<Works />} />
         <Route path="/site" element={<SiteContent />} />
+        <Route path="/visits" element={<Visits />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="*" element={<Navigate to="/admin" replace />} />
       </Routes>

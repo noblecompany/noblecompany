@@ -1,12 +1,17 @@
+import { createHash } from "node:crypto";
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { adminDb } from "./_lib/db.js";
-import { fail, ok } from "./_lib/http.js";
+import { clientIp, fail, ok, rateLimited } from "./_lib/http.js";
 
 /**
  * GET /api/site — 연혁·조직도·클라이언트·활성 팝업·기능 토글을 한 번에 (F14·C1·F16).
  * 공개 페이지가 첫 로드에 한 번 호출한다.
+ *
+ * POST /api/site — 접속 통계 수집 (C2). 라우트 이동마다 sendBeacon 으로 1행.
+ * 별도 /api/track 함수를 만들지 않는 이유: Vercel Hobby 함수 12개 제한 (현재 11개).
  */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  if (req.method === "POST") return trackView(req, res);
   if (req.method !== "GET") return fail(res, "method_not_allowed", "GET only", 405);
 
   const db = adminDb();
@@ -59,4 +64,70 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       : null,
     settings,
   });
+}
+
+/* ================================================= 접속 통계 수집 (C2) */
+
+const BOT_UA =
+  /bot|crawl|spider|slurp|headless|lighthouse|prerender|facebookexternalhit|preview|monitor|pingdom|uptime/i;
+
+async function trackView(req: VercelRequest, res: VercelResponse) {
+  // sendBeacon 은 content-type 이 제각각이라 문자열 본문도 직접 파싱한다
+  let body: unknown = req.body;
+  if (typeof body === "string") {
+    try {
+      body = JSON.parse(body);
+    } catch {
+      body = null;
+    }
+  }
+  const b = body as { path?: unknown; ref?: unknown; landing?: unknown } | null;
+  const path = typeof b?.path === "string" ? b.path.slice(0, 300) : "";
+  if (!path.startsWith("/") || path.startsWith("/admin")) return ok(res);
+  const ref = typeof b?.ref === "string" ? b.ref.slice(0, 500) : "";
+  const landing = b?.landing === true;
+
+  const ua = String(req.headers["user-agent"] ?? "");
+  if (!ua || BOT_UA.test(ua)) return ok(res); // 봇·모니터링은 조용히 무시
+  const ip = clientIp(req);
+  if (rateLimited(`pv:${ip}`, 30)) return ok(res);
+
+  // KST 기준 일자 + 일 단위 익명 방문자 해시 (IP·UA 원문은 저장하지 않는다)
+  const day = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
+  const salt = process.env.TRACK_SALT ?? process.env.SUPABASE_SERVICE_ROLE_KEY ?? "noble";
+  const visitorHash = createHash("sha256")
+    .update(`${salt}|${ip}|${ua}|${day}`)
+    .digest("hex")
+    .slice(0, 32);
+
+  const { group, host } = classifyReferrer(ref, landing);
+  // 통계는 실패해도 방문자 경험에 영향이 없어야 한다 — 오류는 삼킨다
+  await adminDb()
+    .from("page_views")
+    .insert({ day, path, ref_group: group, ref_host: host, visitor_hash: visitorHash })
+    .then(({ error }) => {
+      if (error) console.error("track insert", error.message);
+    });
+  return ok(res);
+}
+
+/** 유입 분류 — 랜딩 페이지뷰만 유입처를 가지며, 이후 내부 이동은 internal */
+function classifyReferrer(ref: string, landing: boolean): { group: string; host: string | null } {
+  if (!landing) return { group: "internal", host: null };
+  if (!ref) return { group: "direct", host: null };
+  try {
+    const host = new URL(ref).hostname.toLowerCase();
+    if (host.endsWith("e-noble.kr") || host === "localhost") return { group: "internal", host };
+    if (host.includes("naver")) return { group: "naver", host };
+    if (host.includes("google")) return { group: "google", host };
+    if (host.includes("daum")) return { group: "daum", host };
+    if (host.includes("kakao")) return { group: "kakao", host };
+    if (host.includes("instagram") || host.includes("facebook") || host.includes("fb.com"))
+      return { group: "meta", host };
+    if (host.includes("youtube") || host === "youtu.be") return { group: "youtube", host };
+    if (host.includes("bing")) return { group: "bing", host };
+    return { group: "etc", host };
+  } catch {
+    return { group: "direct", host: null };
+  }
 }

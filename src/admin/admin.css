@@ -1553,6 +1553,12 @@
   }
 }
 
+/* 우측 정렬 셀의 헤더도 값과 같은 정렬로 —
+   .adm-table th 의 text-align 이 .adm-right 보다 특이도가 높아 th 전용 규칙이 필요하다 */
+.adm-table th.adm-right {
+  text-align: right;
+}
+
 /* ---------- 사이트 진단 리포트 ---------- */
 
 .adm-grade {
@@ -1606,4 +1612,259 @@
   overflow-x: auto;
   white-space: pre-wrap;
   word-break: break-all;
+}
+
+/* ---------- 접속 통계 (C2 — Visits.tsx) ---------- */
+
+.adm-viz-error {
+  margin: 0;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #d64545;
+}
+
+.adm-viz-filters {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.adm-btn--sm {
+  padding: 8px 13px;
+  font-size: 13px;
+  border-radius: 8px;
+}
+
+.adm-viz-filters__dates {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.adm-viz-filters__dates input {
+  padding: 7px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+}
+
+.adm-viz-toggle {
+  display: inline-flex;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.adm-viz-toggle button {
+  padding: 6px 12px;
+  font-size: 12.5px;
+  font-weight: 800;
+  border: 0;
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+}
+
+.adm-viz-toggle button.is-active {
+  background: var(--noble-blue);
+  color: var(--on-accent);
+}
+
+.adm-viz-empty {
+  margin: 0;
+  padding: 26px 18px;
+  font-size: 13.5px;
+  color: var(--text-dim);
+}
+
+/* ----- 일별 막대 차트 */
+.adm-viz-chart {
+  padding: 14px 18px 12px;
+}
+
+.adm-viz-chart__total {
+  margin: 0 0 10px;
+  font-size: 13px;
+  color: var(--text-dim);
+}
+
+.adm-viz-chart__total b {
+  color: var(--text);
+  font-weight: 900;
+}
+
+.adm-viz-plot {
+  position: relative;
+  height: 190px;
+}
+
+/* 눈금 — 헤어라인 격자 + 좌측 값 (텍스트는 텍스트 토큰) */
+.adm-viz-grid {
+  position: absolute;
+  left: 0;
+  right: 0;
+  border-top: 1px solid var(--line-soft);
+  pointer-events: none;
+}
+
+.adm-viz-grid span {
+  position: absolute;
+  left: 0;
+  top: -16px;
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.adm-viz-cols {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+}
+
+/* 열 전체가 히트 영역 — 막대보다 넉넉하게 */
+.adm-viz-col {
+  flex: 1 1 0;
+  min-width: 0;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0 1px; /* 막대 사이 2px 서피스 갭 */
+}
+
+.adm-viz-col.is-hover {
+  background: color-mix(in srgb, var(--noble-blue) 7%, transparent);
+}
+
+/* 막대 — 두께 최대 24px, 데이터 끝만 4px 라운드, 베이스라인은 각지게 */
+.adm-viz-bar {
+  width: 100%;
+  max-width: 24px;
+  min-height: 1px;
+  border-radius: 4px 4px 0 0;
+  background: var(--noble-blue);
+}
+
+.adm-viz-tip {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 11px;
+  border-radius: 9px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+  font-size: 12px;
+  color: var(--text-dim);
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.adm-viz-tip b {
+  color: var(--text);
+  font-size: 12.5px;
+}
+
+.adm-viz-x {
+  display: flex;
+  margin-top: 6px;
+}
+
+.adm-viz-x span {
+  flex: 1 1 0;
+  min-width: 0;
+  text-align: center;
+  font-size: 11px;
+  color: var(--text-dim);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/* ----- 유입 경로 가로 막대 */
+.adm-viz-refs {
+  padding: 12px 18px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+
+.adm-viz-ref {
+  display: grid;
+  grid-template-columns: 130px 1fr 58px 40px;
+  align-items: center;
+  gap: 10px;
+  font-size: 13.5px;
+}
+
+.adm-viz-ref__label {
+  color: var(--text);
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.adm-viz-ref__track {
+  height: 12px;
+  border-radius: 0 4px 4px 0;
+  background: color-mix(in srgb, var(--noble-blue) 10%, transparent);
+  overflow: hidden;
+}
+
+.adm-viz-ref__fill {
+  display: block;
+  height: 100%;
+  min-width: 2px;
+  border-radius: 0 4px 4px 0;
+  background: var(--noble-blue);
+}
+
+.adm-viz-ref__share {
+  text-align: right;
+  font-size: 12.5px;
+}
+
+.adm-viz-num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.adm-viz-delta {
+  font-style: normal;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text-dim);
+}
+
+.adm-viz-delta.is-up {
+  color: #2f9e63;
+}
+
+.adm-viz-delta.is-down {
+  color: #d64545;
+}
+
+.adm-viz-scroll {
+  max-height: 330px;
+  overflow-y: auto;
+}
+
+@media (max-width: 720px) {
+  .adm-viz-filters__dates {
+    margin-left: 0;
+  }
+
+  .adm-viz-ref {
+    grid-template-columns: 92px 1fr 52px 36px;
+  }
 }

@@ -13,6 +13,7 @@ const MENU: Array<{ to: string; label: string; icon: ReactNode }> = [
   { to: "/admin/jobs", label: "채용공고", icon: <IconFile /> },
   { to: "/admin/works", label: "포트폴리오", icon: <IconImage /> },
   { to: "/admin/site", label: "연혁·조직", icon: <IconTree /> },
+  { to: "/admin/visits", label: "접속 통계", icon: <IconChart /> },
   { to: "/admin/settings", label: "사이트 설정", icon: <IconGear /> },
 ];
 
@@ -24,6 +25,7 @@ const TITLE: Record<string, string> = {
   "/admin/jobs": "채용공고",
   "/admin/works": "포트폴리오",
   "/admin/site": "연혁·조직",
+  "/admin/visits": "접속 통계",
   "/admin/settings": "사이트 설정",
 };
 
@@ -261,6 +263,13 @@ function IconImage() {
       <rect x="3" y="4" width="18" height="16" rx="2" />
       <circle cx="9" cy="10" r="1.8" />
       <path d="m4 18 5-5 3 3 4-4 4 4" />
+    </svg>
+  );
+}
+function IconChart() {
+  return (
+    <svg {...p} aria-hidden="true">
+      <path d="M4 20V10M10 20V4M16 20v-8M21 20H3" />
     </svg>
   );
 }

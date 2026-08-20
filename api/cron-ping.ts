@@ -53,6 +53,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const cutoff = new Date(Date.now() - 90 * 86400 * 1000).toISOString();
   await db.from("notifications").delete().lt("created_at", cutoff);
 
+  // ---- 400일 지난 접속 통계 정리 (전년 동기 비교가 가능한 13개월치만 보관)
+  const pvCutoff = new Date(Date.now() - 400 * 86400 * 1000).toISOString();
+  await db.from("page_views").delete().lt("created_at", pvCutoff);
+
   return ok(res, {
     pinged: true,
     purgedInquiries: expiredInq?.length ?? 0,
