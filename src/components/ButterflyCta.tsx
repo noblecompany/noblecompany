@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { DESIGN_PORTFOLIO_URL } from "../data/company";
 
 /**
  * 우측 하단 플로팅 퀵메뉴.
@@ -30,6 +31,17 @@ export default function ButterflyCta() {
         문의하기
       </Link>
 
+      <a
+        href={DESIGN_PORTFOLIO_URL}
+        target="_blank"
+        rel="noreferrer"
+        className="qmenu__item qmenu__item--design"
+        tabIndex={open ? 0 : undefined}
+      >
+        디자인 포트폴리오
+        <ArrowIcon />
+      </a>
+
       <button
         type="button"
         className="qmenu__fab"
@@ -56,6 +68,15 @@ function SearchIcon() {
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <circle cx="11" cy="11" r="7" />
       <path d="m20.5 20.5-4.2-4.2" />
+    </svg>
+  );
+}
+
+function ArrowIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M8 6h10v10" />
+      <path d="M18 6 6 18" />
     </svg>
   );
 }

@@ -527,16 +527,26 @@ img {
 
 .qmenu__item--diag {
   --qx: -14px;
-  --qy: -88px;
+  --qy: -154px;
   background: var(--noble-blue);
   border-color: var(--noble-blue);
   color: var(--on-accent);
 }
 
 .qmenu__item--contact {
-  --qx: -90px;
-  --qy: -18px;
+  --qx: -46px;
+  --qy: -96px;
   transition-delay: 0.05s;
+}
+
+/* 헤더의 디자인 포트폴리오 버튼과 동일한 테마 반전색 — 라이트: 잉크 블랙 / 다크: 화이트 */
+.qmenu__item--design {
+  --qx: -100px;
+  --qy: -20px;
+  background: var(--text);
+  border-color: transparent;
+  color: var(--bg);
+  transition-delay: 0.1s;
 }
 
 .qmenu.is-open .qmenu__item {
