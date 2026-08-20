@@ -1,15 +1,15 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import {
+  adminApi,
+  adminDownloadCsv,
   APPLICATION_STATUS_LABEL,
   APPLICATION_STEPS,
   formatDate,
-  maskEmail,
-  maskPhone,
-  mockApplications,
   timeAgo,
   type Application,
   type ApplicationStatus,
-} from "../mockData";
+} from "../api";
 
 const STATUS_FILTERS: Array<"ALL" | ApplicationStatus> = [
   "ALL",
@@ -20,12 +20,27 @@ const STATUS_FILTERS: Array<"ALL" | ApplicationStatus> = [
   "rejected",
 ];
 
-/** 지원자 관리 — 목록 + 슬라이드 패널 상세 (목데이터) */
+/** 지원자 관리 (1-8) — 목록 + 전형 단계 스텝퍼 + 이력서 60초 signed URL 열람 */
 export default function Applications() {
-  const [rows, setRows] = useState<Application[]>(mockApplications);
+  const [rows, setRows] = useState<Application[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<"ALL" | ApplicationStatus>("ALL");
   const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [params, setParams] = useSearchParams();
+
+  useEffect(() => {
+    adminApi<Application[]>("/applications")
+      .then((list) => {
+        setRows(list);
+        const deepLink = params.get("id");
+        if (deepLink && list.some((r) => r.id === deepLink)) setSelectedId(deepLink);
+      })
+      .catch((e: Error) => setError(e.message))
+      .finally(() => setLoading(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const filtered = useMemo(() => {
     let list = rows;
@@ -43,6 +58,20 @@ export default function Applications() {
 
   const update = (id: string, patch: Partial<Application>) =>
     setRows((list) => list.map((r) => (r.id === id ? { ...r, ...patch } : r)));
+
+  const save = (id: string, patch: Partial<Pick<Application, "status" | "memo">>) => {
+    update(id, patch);
+    void adminApi(`/applications/${id}`, { method: "PATCH", body: patch }).catch((e: Error) =>
+      alert(`저장 실패: ${e.message}`),
+    );
+  };
+
+  const close = () => {
+    setSelectedId(null);
+    if (params.get("id")) setParams({}, { replace: true });
+  };
+
+  if (error) return <p className="adm-pagemsg adm-pagemsg--error">{error}</p>;
 
   return (
     <>
@@ -65,12 +94,22 @@ export default function Applications() {
           ))}
         </div>
 
-        <input
-          className="adm-search"
-          placeholder="지원자·공고 검색"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-        />
+        <div className="adm-toolbar__right">
+          <input
+            className="adm-search"
+            placeholder="지원자·공고 검색"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+          />
+          <button
+            type="button"
+            className="adm-btn"
+            onClick={() => void adminDownloadCsv("applications").catch((e: Error) => alert(e.message))}
+            title="owner 전용 · 감사 로그에 기록됩니다"
+          >
+            CSV 내보내기
+          </button>
+        </div>
       </div>
 
       <section className="adm-panel">
@@ -86,30 +125,40 @@ export default function Applications() {
             </tr>
           </thead>
           <tbody>
-            {filtered.map((r) => (
-              <tr
-                key={r.id}
-                className={selectedId === r.id ? "is-selected" : ""}
-                onClick={() => setSelectedId(r.id)}
-              >
-                <td>
-                  <b>{r.name}</b>
-                </td>
-                <td className="adm-dim">{r.postingTitle}</td>
-                <td className="adm-dim">{r.careerYears ?? "—"}</td>
-                <td className="adm-dim">{r.resumeName ? "📎 첨부" : "—"}</td>
-                <td>
-                  <span className={`adm-badge adm-badge--app-${r.status}`}>
-                    {APPLICATION_STATUS_LABEL[r.status]}
-                  </span>
-                </td>
-                <td className="adm-dim adm-right">{timeAgo(r.createdAt)}</td>
-              </tr>
-            ))}
-            {filtered.length === 0 && (
+            {loading && (
               <tr>
                 <td colSpan={6} className="adm-empty">
-                  조건에 맞는 지원자가 없습니다
+                  불러오는 중…
+                </td>
+              </tr>
+            )}
+            {!loading &&
+              filtered.map((r) => (
+                <tr
+                  key={r.id}
+                  className={selectedId === r.id ? "is-selected" : ""}
+                  onClick={() => setSelectedId(r.id)}
+                >
+                  <td>
+                    <b>{r.name}</b>
+                  </td>
+                  <td className="adm-dim">{r.postingTitle}</td>
+                  <td className="adm-dim">{r.careerYears ?? "—"}</td>
+                  <td className="adm-dim">{r.hasResume ? "📎 첨부" : "—"}</td>
+                  <td>
+                    <span className={`adm-badge adm-badge--app-${r.status}`}>
+                      {APPLICATION_STATUS_LABEL[r.status]}
+                    </span>
+                  </td>
+                  <td className="adm-dim adm-right">{timeAgo(r.createdAt)}</td>
+                </tr>
+              ))}
+            {!loading && filtered.length === 0 && (
+              <tr>
+                <td colSpan={6} className="adm-empty">
+                  {rows.length === 0
+                    ? "아직 접수된 지원서가 없습니다"
+                    : "조건에 맞는 지원자가 없습니다"}
                 </td>
               </tr>
             )}
@@ -120,8 +169,9 @@ export default function Applications() {
       {selected && (
         <DetailPanel
           app={selected}
-          onClose={() => setSelectedId(null)}
-          onChange={(patch) => update(selected.id, patch)}
+          onClose={close}
+          onSave={(patch) => save(selected.id, patch)}
+          onReveal={(full) => update(selected.id, full)}
         />
       )}
     </>
@@ -131,14 +181,41 @@ export default function Applications() {
 function DetailPanel({
   app: a,
   onClose,
-  onChange,
+  onSave,
+  onReveal,
 }: {
   app: Application;
   onClose: () => void;
-  onChange: (patch: Partial<Application>) => void;
+  onSave: (patch: Partial<Pick<Application, "status" | "memo">>) => void;
+  onReveal: (full: { phone: string; email: string }) => void;
 }) {
   const [revealed, setRevealed] = useState(false);
+  const [memo, setMemo] = useState(a.memo ?? "");
+  const [resumeBusy, setResumeBusy] = useState(false);
   const rejected = a.status === "rejected";
+
+  useEffect(() => {
+    setRevealed(false);
+    setMemo(a.memo ?? "");
+  }, [a.id]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const reveal = () => {
+    adminApi<{ phone: string; email: string }>(`/applications/${a.id}/reveal`, { method: "POST" })
+      .then((full) => {
+        onReveal(full);
+        setRevealed(true);
+      })
+      .catch((e: Error) => alert(e.message));
+  };
+
+  /** 이력서 — 60초 signed URL 을 받아 새 탭에서 연다 (감사 로그 기록됨) */
+  const openResume = () => {
+    setResumeBusy(true);
+    adminApi<{ url: string }>(`/applications/${a.id}/resume`)
+      .then(({ url }) => window.open(url, "_blank", "noopener"))
+      .catch((e: Error) => alert(e.message))
+      .finally(() => setResumeBusy(false));
+  };
 
   return (
     <div className="adm-drawer" role="dialog" aria-label={`${a.name} 지원 상세`}>
@@ -169,7 +246,7 @@ function DetailPanel({
                 key={s}
                 type="button"
                 className={`adm-steps__item ${state}`}
-                onClick={() => onChange({ status: s })}
+                onClick={() => onSave({ status: s })}
               >
                 <i>{i + 1}</i>
                 {APPLICATION_STATUS_LABEL[s]}
@@ -179,7 +256,7 @@ function DetailPanel({
           <button
             type="button"
             className={`adm-steps__reject ${rejected ? "is-current" : ""}`}
-            onClick={() => onChange({ status: "rejected" })}
+            onClick={() => onSave({ status: "rejected" })}
           >
             불합격
           </button>
@@ -188,16 +265,15 @@ function DetailPanel({
         <dl className="adm-dl">
           <div>
             <dt>연락처</dt>
-            <dd>{revealed ? a.phone : maskPhone(a.phone)}</dd>
+            <dd>{a.phone}</dd>
           </div>
           <div>
             <dt>이메일</dt>
-            <dd>{revealed ? a.email : maskEmail(a.email)}</dd>
+            <dd>{a.email}</dd>
           </div>
           {!revealed && (
             <div className="adm-dl__action">
-              {/* TODO(F15): 열람 시 audit_logs INSERT */}
-              <button type="button" onClick={() => setRevealed(true)}>
+              <button type="button" onClick={reveal}>
                 개인정보 전체 보기 (열람 기록 남음)
               </button>
             </div>
@@ -209,10 +285,15 @@ function DetailPanel({
           <div>
             <dt>이력서</dt>
             <dd>
-              {a.resumeName ? (
-                // TODO(1-8): 60초 signed URL 발급으로 교체
-                <button type="button" className="adm-linkbtn" title="Storage 연동 후 열람 가능">
-                  📎 {a.resumeName}
+              {a.hasResume ? (
+                <button
+                  type="button"
+                  className="adm-linkbtn"
+                  onClick={openResume}
+                  disabled={resumeBusy}
+                  title="60초 유효 링크로 열립니다 · 열람 기록이 남습니다"
+                >
+                  📎 {resumeBusy ? "링크 발급 중…" : "이력서 열기 (열람 기록 남음)"}
                 </button>
               ) : (
                 "미첨부"
@@ -243,9 +324,12 @@ function DetailPanel({
           <label className="adm-field">
             <textarea
               rows={4}
-              value={a.memo ?? ""}
-              placeholder="면접 일정, 평가 내용 등"
-              onChange={(e) => onChange({ memo: e.target.value || null })}
+              value={memo}
+              placeholder="면접 일정, 평가 내용 등 — 입력 후 바깥을 클릭하면 저장됩니다"
+              onChange={(e) => setMemo(e.target.value)}
+              onBlur={() => {
+                if ((a.memo ?? "") !== memo) onSave({ memo: memo || null });
+              }}
             />
           </label>
           <p className="adm-retention">보관기간 만료: {a.retentionUntil} (자동 파기 예정)</p>

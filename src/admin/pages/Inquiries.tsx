@@ -1,14 +1,14 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import {
+  adminApi,
+  adminDownloadCsv,
   formatDate,
   INQUIRY_STATUS_LABEL,
-  maskEmail,
-  maskPhone,
-  mockInquiries,
   timeAgo,
   type Inquiry,
   type InquiryStatus,
-} from "../mockData";
+} from "../api";
 
 const STATUS_FILTERS: Array<"ALL" | InquiryStatus> = [
   "ALL",
@@ -19,12 +19,28 @@ const STATUS_FILTERS: Array<"ALL" | InquiryStatus> = [
   "lost",
 ];
 
-/** 문의 관리 — 목록 + 우측 슬라이드 패널 상세 (목데이터) */
+/** 문의 관리 (1-8) — 목록 + 우측 슬라이드 패널 상세. 개인정보는 기본 마스킹 */
 export default function Inquiries() {
-  const [rows, setRows] = useState<Inquiry[]>(mockInquiries);
+  const [rows, setRows] = useState<Inquiry[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<"ALL" | InquiryStatus>("ALL");
   const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [params, setParams] = useSearchParams();
+
+  useEffect(() => {
+    adminApi<Inquiry[]>("/inquiries")
+      .then((list) => {
+        setRows(list);
+        // 알림 링크(?id=)로 진입하면 해당 상세를 바로 연다
+        const deepLink = params.get("id");
+        if (deepLink && list.some((r) => r.id === deepLink)) setSelectedId(deepLink);
+      })
+      .catch((e: Error) => setError(e.message))
+      .finally(() => setLoading(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const filtered = useMemo(() => {
     let list = rows;
@@ -45,6 +61,25 @@ export default function Inquiries() {
 
   const update = (id: string, patch: Partial<Inquiry>) =>
     setRows((list) => list.map((r) => (r.id === id ? { ...r, ...patch } : r)));
+
+  /** 화면 먼저 갱신 → 서버 PATCH. 실패 시 알림만 (다음 로드에서 동기화) */
+  const save = (id: string, patch: Partial<Pick<Inquiry, "status" | "assignee" | "memo">>) => {
+    update(id, patch);
+    void adminApi(`/inquiries/${id}`, { method: "PATCH", body: patch }).catch((e: Error) =>
+      alert(`저장 실패: ${e.message}`),
+    );
+  };
+
+  const close = () => {
+    setSelectedId(null);
+    if (params.get("id")) setParams({}, { replace: true });
+  };
+
+  const exportCsv = () => {
+    void adminDownloadCsv("inquiries").catch((e: Error) => alert(e.message));
+  };
+
+  if (error) return <p className="adm-pagemsg adm-pagemsg--error">{error}</p>;
 
   return (
     <>
@@ -67,12 +102,17 @@ export default function Inquiries() {
           ))}
         </div>
 
-        <input
-          className="adm-search"
-          placeholder="회사명·담당자·문의유형 검색"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-        />
+        <div className="adm-toolbar__right">
+          <input
+            className="adm-search"
+            placeholder="회사명·담당자·문의유형 검색"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+          />
+          <button type="button" className="adm-btn" onClick={exportCsv} title="owner 전용 · 감사 로그에 기록됩니다">
+            CSV 내보내기
+          </button>
+        </div>
       </div>
 
       <section className="adm-panel">
@@ -89,31 +129,39 @@ export default function Inquiries() {
             </tr>
           </thead>
           <tbody>
-            {filtered.map((r) => (
-              <tr
-                key={r.id}
-                className={selectedId === r.id ? "is-selected" : ""}
-                onClick={() => setSelectedId(r.id)}
-              >
-                <td>
-                  <b>{r.company}</b>
-                </td>
-                <td>{r.name}</td>
-                <td className="adm-dim">{r.types.join(" · ")}</td>
-                <td className="adm-dim">{r.budget ?? "—"}</td>
-                <td>
-                  <span className={`adm-badge adm-badge--inq-${r.status}`}>
-                    {INQUIRY_STATUS_LABEL[r.status]}
-                  </span>
-                </td>
-                <td className="adm-dim">{r.assignee ?? "—"}</td>
-                <td className="adm-dim adm-right">{timeAgo(r.createdAt)}</td>
-              </tr>
-            ))}
-            {filtered.length === 0 && (
+            {loading && (
               <tr>
                 <td colSpan={7} className="adm-empty">
-                  조건에 맞는 문의가 없습니다
+                  불러오는 중…
+                </td>
+              </tr>
+            )}
+            {!loading &&
+              filtered.map((r) => (
+                <tr
+                  key={r.id}
+                  className={selectedId === r.id ? "is-selected" : ""}
+                  onClick={() => setSelectedId(r.id)}
+                >
+                  <td>
+                    <b>{r.company}</b>
+                  </td>
+                  <td>{r.name}</td>
+                  <td className="adm-dim">{r.types.join(" · ")}</td>
+                  <td className="adm-dim">{r.budget ?? "—"}</td>
+                  <td>
+                    <span className={`adm-badge adm-badge--inq-${r.status}`}>
+                      {INQUIRY_STATUS_LABEL[r.status]}
+                    </span>
+                  </td>
+                  <td className="adm-dim">{r.assignee ?? "—"}</td>
+                  <td className="adm-dim adm-right">{timeAgo(r.createdAt)}</td>
+                </tr>
+              ))}
+            {!loading && filtered.length === 0 && (
+              <tr>
+                <td colSpan={7} className="adm-empty">
+                  {rows.length === 0 ? "아직 접수된 문의가 없습니다" : "조건에 맞는 문의가 없습니다"}
                 </td>
               </tr>
             )}
@@ -124,8 +172,9 @@ export default function Inquiries() {
       {selected && (
         <DetailPanel
           inquiry={selected}
-          onClose={() => setSelectedId(null)}
-          onChange={(patch) => update(selected.id, patch)}
+          onClose={close}
+          onSave={(patch) => save(selected.id, patch)}
+          onReveal={(full) => update(selected.id, full)}
         />
       )}
     </>
@@ -135,14 +184,34 @@ export default function Inquiries() {
 function DetailPanel({
   inquiry: q,
   onClose,
-  onChange,
+  onSave,
+  onReveal,
 }: {
   inquiry: Inquiry;
   onClose: () => void;
-  onChange: (patch: Partial<Inquiry>) => void;
+  onSave: (patch: Partial<Pick<Inquiry, "status" | "assignee" | "memo">>) => void;
+  onReveal: (full: { phone: string; email: string }) => void;
 }) {
-  // 개인정보는 기본 마스킹 — 전체 보기 시 감사 로그(F15) 기록 지점
+  // 개인정보 기본 마스킹 — 전체 보기 시 서버가 감사 로그(F15)를 남기고 원본을 준다
   const [revealed, setRevealed] = useState(false);
+  const [assignee, setAssignee] = useState(q.assignee ?? "");
+  const [memo, setMemo] = useState(q.memo ?? "");
+
+  // 다른 행을 선택하면 로컬 편집값을 그 행 기준으로 리셋한다
+  useEffect(() => {
+    setRevealed(false);
+    setAssignee(q.assignee ?? "");
+    setMemo(q.memo ?? "");
+  }, [q.id]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const reveal = () => {
+    adminApi<{ phone: string; email: string }>(`/inquiries/${q.id}/reveal`, { method: "POST" })
+      .then((full) => {
+        onReveal(full);
+        setRevealed(true);
+      })
+      .catch((e: Error) => alert(e.message));
+  };
 
   return (
     <div className="adm-drawer" role="dialog" aria-label={`${q.company} 문의 상세`}>
@@ -170,16 +239,15 @@ function DetailPanel({
           </div>
           <div>
             <dt>연락처</dt>
-            <dd>{revealed ? q.phone : maskPhone(q.phone)}</dd>
+            <dd>{q.phone}</dd>
           </div>
           <div>
             <dt>이메일</dt>
-            <dd>{revealed ? q.email : maskEmail(q.email)}</dd>
+            <dd>{q.email}</dd>
           </div>
           {!revealed && (
             <div className="adm-dl__action">
-              {/* TODO(F15): 열람 시 audit_logs INSERT */}
-              <button type="button" onClick={() => setRevealed(true)}>
+              <button type="button" onClick={reveal}>
                 개인정보 전체 보기 (열람 기록 남음)
               </button>
             </div>
@@ -194,6 +262,12 @@ function DetailPanel({
               {q.budget ?? "미입력"} / {q.period ?? "미입력"}
             </dd>
           </div>
+          {q.source && (
+            <div>
+              <dt>유입 경로</dt>
+              <dd>{q.source}</dd>
+            </div>
+          )}
         </dl>
 
         {q.message && (
@@ -209,7 +283,7 @@ function DetailPanel({
             <span>상태</span>
             <select
               value={q.status}
-              onChange={(e) => onChange({ status: e.target.value as InquiryStatus })}
+              onChange={(e) => onSave({ status: e.target.value as InquiryStatus })}
             >
               {(Object.keys(INQUIRY_STATUS_LABEL) as InquiryStatus[]).map((s) => (
                 <option key={s} value={s}>
@@ -221,18 +295,24 @@ function DetailPanel({
           <label className="adm-field">
             <span>담당 AE</span>
             <input
-              value={q.assignee ?? ""}
+              value={assignee}
               placeholder="예) 기획1팀 최AE"
-              onChange={(e) => onChange({ assignee: e.target.value || null })}
+              onChange={(e) => setAssignee(e.target.value)}
+              onBlur={() => {
+                if ((q.assignee ?? "") !== assignee) onSave({ assignee: assignee || null });
+              }}
             />
           </label>
           <label className="adm-field">
             <span>내부 메모</span>
             <textarea
               rows={4}
-              value={q.memo ?? ""}
-              placeholder="상담 내용, 다음 액션 등"
-              onChange={(e) => onChange({ memo: e.target.value || null })}
+              value={memo}
+              placeholder="상담 내용, 다음 액션 등 — 입력 후 바깥을 클릭하면 저장됩니다"
+              onChange={(e) => setMemo(e.target.value)}
+              onBlur={() => {
+                if ((q.memo ?? "") !== memo) onSave({ memo: memo || null });
+              }}
             />
           </label>
         </div>

@@ -1,45 +1,51 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { deadlineLabel, isClosed, jobPostings } from "../../data/careers";
-import {
-  INQUIRY_STATUS_LABEL,
-  mockApplications,
-  mockInquiries,
-  timeAgo,
-} from "../mockData";
+import { adminApi, INQUIRY_STATUS_LABEL, timeAgo, type InquiryStatus } from "../api";
 
-/** 최근 7일 접수 추이 목데이터 (문의/지원 건수) */
-const WEEK: Array<{ day: string; inq: number; app: number }> = [
-  { day: "7/30", inq: 1, app: 0 },
-  { day: "7/31", inq: 0, app: 1 },
-  { day: "8/1", inq: 1, app: 1 },
-  { day: "8/2", inq: 1, app: 0 },
-  { day: "8/3", inq: 1, app: 1 },
-  { day: "8/4", inq: 1, app: 1 },
-  { day: "8/5", inq: 2, app: 1 },
-];
+interface DashboardData {
+  todayInquiries: number;
+  todayApplications: number;
+  openPostings: number;
+  week: Array<{ day: string; inq: number; app: number }>;
+  recentInquiries: Array<{
+    id: string;
+    company: string;
+    types: string[];
+    status: InquiryStatus;
+    createdAt: string;
+  }>;
+  closingPostings: Array<{ id: string; title: string; team: string; deadline: string }>;
+}
 
+/** 대시보드 — 오늘의 접수·마감 임박 공고·최근 7일 추이 (설계 §6.2) */
 export default function Dashboard() {
-  const today = "2026-08-05";
-  const newInquiries = mockInquiries.filter((i) => i.createdAt.startsWith(today)).length;
-  const newApplications = mockApplications.filter((a) => a.createdAt.startsWith(today)).length;
-  const openPostings = jobPostings.filter((j) => !isClosed(j, new Date(today))).length;
-  const max = Math.max(...WEEK.map((w) => w.inq + w.app));
+  const [data, setData] = useState<DashboardData | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  // 마감일 있는 공고를 임박순으로
-  const closing = jobPostings
-    .filter((j) => j.deadline && !isClosed(j, new Date(today)))
-    .sort((a, b) => (a.deadline as string).localeCompare(b.deadline as string));
+  useEffect(() => {
+    adminApi<DashboardData>("/dashboard").then(setData).catch((e: Error) => setError(e.message));
+  }, []);
+
+  if (error) return <p className="adm-pagemsg adm-pagemsg--error">{error}</p>;
+  if (!data) return <p className="adm-pagemsg">불러오는 중…</p>;
+
+  const weekTotal = data.week.reduce((s, w) => s + w.inq + w.app, 0);
+  const max = Math.max(1, ...data.week.map((w) => Math.max(w.inq, w.app)));
+
+  const dday = (deadline: string) => {
+    const diff = Math.ceil(
+      (new Date(`${deadline}T23:59:59`).getTime() - Date.now()) / 86400000,
+    );
+    return diff <= 0 ? "D-DAY" : `D-${diff}`;
+  };
 
   return (
     <>
       <div className="adm-cards">
-        <StatCard label="오늘 신규 문의" value={newInquiries} to="/admin/inquiries" />
-        <StatCard label="오늘 신규 지원" value={newApplications} to="/admin/applications" />
-        <StatCard label="게시 중 공고" value={openPostings} />
-        <StatCard
-          label="이번 주 접수"
-          value={WEEK.reduce((s, w) => s + w.inq + w.app, 0)}
-        />
+        <StatCard label="오늘 신규 문의" value={data.todayInquiries} to="/admin/inquiries" />
+        <StatCard label="오늘 신규 지원" value={data.todayApplications} to="/admin/applications" />
+        <StatCard label="게시 중 공고" value={data.openPostings} to="/admin/jobs" />
+        <StatCard label="최근 7일 접수" value={weekTotal} />
       </div>
 
       <div className="adm-grid2">
@@ -50,7 +56,7 @@ export default function Dashboard() {
           </header>
           <table className="adm-table">
             <tbody>
-              {mockInquiries.slice(0, 5).map((q) => (
+              {data.recentInquiries.map((q) => (
                 <tr key={q.id}>
                   <td>
                     <b>{q.company}</b>
@@ -64,6 +70,11 @@ export default function Dashboard() {
                   <td className="adm-dim adm-right">{timeAgo(q.createdAt)}</td>
                 </tr>
               ))}
+              {data.recentInquiries.length === 0 && (
+                <tr>
+                  <td className="adm-dim">아직 접수된 문의가 없습니다</td>
+                </tr>
+              )}
             </tbody>
           </table>
         </section>
@@ -71,21 +82,22 @@ export default function Dashboard() {
         <section className="adm-panel">
           <header className="adm-panel__head">
             <h2>마감 임박 공고</h2>
+            <Link to="/admin/jobs">공고 관리 →</Link>
           </header>
           <table className="adm-table">
             <tbody>
-              {closing.map((j) => (
+              {data.closingPostings.map((j) => (
                 <tr key={j.id}>
                   <td>
                     <b>{j.title}</b>
                   </td>
                   <td className="adm-dim">{j.team}</td>
                   <td className="adm-right">
-                    <span className="adm-badge adm-badge--deadline">{deadlineLabel(j)}</span>
+                    <span className="adm-badge adm-badge--deadline">{dday(j.deadline)}</span>
                   </td>
                 </tr>
               ))}
-              {closing.length === 0 && (
+              {data.closingPostings.length === 0 && (
                 <tr>
                   <td className="adm-dim">마감일이 설정된 공고가 없습니다</td>
                 </tr>
@@ -104,7 +116,7 @@ export default function Dashboard() {
           </div>
         </header>
         <div className="adm-chart" role="img" aria-label="최근 7일 문의·지원 접수 추이">
-          {WEEK.map((w) => (
+          {data.week.map((w) => (
             <div className="adm-chart__col" key={w.day}>
               <div className="adm-chart__bars">
                 <div

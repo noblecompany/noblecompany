@@ -1,28 +1,28 @@
-import { useEffect, useRef, useState, type PropsWithChildren, type ReactNode } from "react";
+import { useCallback, useEffect, useRef, useState, type PropsWithChildren, type ReactNode } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
+import { supabase } from "../lib/supabaseClient";
 import { useTheme } from "../lib/theme";
-import { mockNotifications, timeAgo } from "./mockData";
+import { adminApi, timeAgo, type AdminNotification } from "./api";
 
-/** 사이드바 메뉴 — Phase 2·3 항목은 자리만 잡아두고 비활성 표시 */
-const MENU: Array<{
-  to?: string;
-  label: string;
-  icon: ReactNode;
-  phase?: 2 | 3;
-}> = [
+/** 사이드바 메뉴 — 설계 §6.1 정보 구조 */
+const MENU: Array<{ to: string; label: string; icon: ReactNode }> = [
   { to: "/admin", label: "대시보드", icon: <IconGrid /> },
   { to: "/admin/inquiries", label: "문의 관리", icon: <IconMail /> },
   { to: "/admin/applications", label: "지원자 관리", icon: <IconUsers /> },
-  { label: "채용공고", icon: <IconFile />, phase: 2 },
-  { label: "포트폴리오", icon: <IconImage />, phase: 2 },
-  { label: "연혁·조직", icon: <IconTree />, phase: 3 },
-  { label: "사이트 설정", icon: <IconGear />, phase: 3 },
+  { to: "/admin/jobs", label: "채용공고", icon: <IconFile /> },
+  { to: "/admin/works", label: "포트폴리오", icon: <IconImage /> },
+  { to: "/admin/site", label: "연혁·조직", icon: <IconTree /> },
+  { to: "/admin/settings", label: "사이트 설정", icon: <IconGear /> },
 ];
 
 const TITLE: Record<string, string> = {
   "/admin": "대시보드",
   "/admin/inquiries": "문의 관리",
   "/admin/applications": "지원자 관리",
+  "/admin/jobs": "채용공고",
+  "/admin/works": "포트폴리오",
+  "/admin/site": "연혁·조직",
+  "/admin/settings": "사이트 설정",
 };
 
 export default function AdminLayout({
@@ -41,29 +41,17 @@ export default function AdminLayout({
         </Link>
 
         <nav className="adm-side__nav" aria-label="관리 메뉴">
-          {MENU.map((m) =>
-            m.to ? (
-              <NavLink
-                key={m.label}
-                to={m.to}
-                end={m.to === "/admin"}
-                className={({ isActive }) => `adm-side__item ${isActive ? "is-active" : ""}`}
-              >
-                {m.icon}
-                {m.label}
-              </NavLink>
-            ) : (
-              <span
-                key={m.label}
-                className="adm-side__item is-disabled"
-                title={`Phase ${m.phase} 개발 예정`}
-              >
-                {m.icon}
-                {m.label}
-                <em>P{m.phase}</em>
-              </span>
-            ),
-          )}
+          {MENU.map((m) => (
+            <NavLink
+              key={m.to}
+              to={m.to}
+              end={m.to === "/admin"}
+              className={({ isActive }) => `adm-side__item ${isActive ? "is-active" : ""}`}
+            >
+              {m.icon}
+              {m.label}
+            </NavLink>
+          ))}
         </nav>
 
         <div className="adm-side__foot">
@@ -82,10 +70,6 @@ export default function AdminLayout({
           </div>
 
           <div className="adm-top__actions">
-            {/* 문의·지원 데이터 실연동(1-8) 완료 시 제거 */}
-            <span className="adm-devbadge" title="화면 데이터는 아직 목데이터입니다 (접수 연동 진행 중)">
-              목데이터 표시 중
-            </span>
             <NotificationBell />
             <button
               type="button"
@@ -107,12 +91,50 @@ export default function AdminLayout({
   );
 }
 
-/** 알림센터 — Supabase Realtime(1-6) 연동 전 목데이터 드롭다운 */
+/**
+ * 알림센터 (F6) — 서버 목록 + Supabase Realtime 으로 신규 접수를 새로고침 없이 반영.
+ * 읽음 상태는 사용자별로 notification_reads 에 기록된다.
+ */
 function NotificationBell() {
   const [open, setOpen] = useState(false);
-  const [items, setItems] = useState(mockNotifications);
+  const [items, setItems] = useState<AdminNotification[]>([]);
   const ref = useRef<HTMLDivElement>(null);
   const unread = items.filter((n) => !n.read).length;
+
+  const load = useCallback(() => {
+    adminApi<AdminNotification[]>("/notifications")
+      .then(setItems)
+      .catch(() => undefined); // 알림은 부가 기능 — 실패해도 화면을 막지 않는다
+  }, []);
+
+  useEffect(() => {
+    load();
+    if (!supabase) return;
+    const ch = supabase
+      .channel("admin-notifications")
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "notifications" },
+        (payload) => {
+          const n = payload.new as {
+            id: string; type: "inquiry" | "application"; title: string;
+            link: string; created_at: string;
+          };
+          setItems((prev) =>
+            prev.some((x) => x.id === n.id)
+              ? prev
+              : [
+                  { id: n.id, type: n.type, title: n.title, link: n.link, createdAt: n.created_at, read: false },
+                  ...prev,
+                ],
+          );
+        },
+      )
+      .subscribe();
+    return () => {
+      void supabase?.removeChannel(ch);
+    };
+  }, [load]);
 
   useEffect(() => {
     if (!open) return;
@@ -122,6 +144,14 @@ function NotificationBell() {
     document.addEventListener("mousedown", onClick);
     return () => document.removeEventListener("mousedown", onClick);
   }, [open]);
+
+  const markRead = (id?: string) => {
+    // 화면 먼저 갱신하고 서버에 기록 (실패해도 다음 로드에서 동기화)
+    setItems((list) => list.map((n) => (id ? (n.id === id ? { ...n, read: true } : n) : { ...n, read: true })));
+    void adminApi("/notifications/read", { method: "POST", body: id ? { id } : { all: true } }).catch(
+      () => undefined,
+    );
+  };
 
   return (
     <div className="adm-bell" ref={ref}>
@@ -133,7 +163,7 @@ function NotificationBell() {
         aria-expanded={open}
       >
         <IconBell />
-        {unread > 0 && <span className="adm-bell__badge">{unread}</span>}
+        {unread > 0 && <span className="adm-bell__badge">{unread > 9 ? "9+" : unread}</span>}
       </button>
 
       {open && (
@@ -141,24 +171,22 @@ function NotificationBell() {
           <div className="adm-bell__head">
             <b>알림</b>
             {unread > 0 && (
-              <button
-                type="button"
-                onClick={() => setItems((list) => list.map((n) => ({ ...n, read: true })))}
-              >
+              <button type="button" onClick={() => markRead()}>
                 모두 읽음
               </button>
             )}
           </div>
           <ul>
+            {items.length === 0 && (
+              <li className="adm-bell__empty">아직 알림이 없습니다</li>
+            )}
             {items.map((n) => (
               <li key={n.id}>
                 <Link
                   to={n.link}
                   className={n.read ? "" : "is-unread"}
                   onClick={() => {
-                    setItems((list) =>
-                      list.map((x) => (x.id === n.id ? { ...x, read: true } : x)),
-                    );
+                    markRead(n.id);
                     setOpen(false);
                   }}
                 >

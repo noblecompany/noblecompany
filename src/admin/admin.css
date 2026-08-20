@@ -971,3 +971,412 @@
     grid-template-columns: 1fr 1fr;
   }
 }
+
+/* ============================================================
+   실연동·신규 화면 (공고·포트폴리오·연혁조직·설정) 추가 스타일
+   ============================================================ */
+
+.adm-pagemsg {
+  padding: 28px 6px;
+  color: var(--text-dim);
+  font-size: 14px;
+}
+
+.adm-pagemsg--error {
+  color: #d64545;
+  font-weight: 700;
+}
+
+.adm-toolbar__right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.adm-toolbar__note {
+  font-size: 13px;
+  color: var(--text-dim);
+}
+
+.adm-cell-sub {
+  display: block;
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+.adm-warn {
+  color: #d68f2c;
+  font-style: normal;
+  font-size: 12px;
+}
+
+/* 공고·팝업 상태 배지 */
+.adm-badge--job-draft {
+  background: color-mix(in srgb, var(--text-dim) 16%, transparent);
+  color: var(--text-dim);
+}
+.adm-badge--job-published,
+.adm-badge--pop-live {
+  background: color-mix(in srgb, #2e9e5b 18%, transparent);
+  color: #2e9e5b;
+}
+.adm-badge--job-closed,
+.adm-badge--pop-off {
+  background: color-mix(in srgb, var(--text-dim) 14%, transparent);
+  color: var(--text-dim);
+}
+
+/* 넓은 편집 드로어 (공고·포트폴리오) */
+.adm-drawer__panel--wide {
+  width: min(760px, 100vw);
+}
+
+/* 2열 폼 그리드 */
+.adm-formgrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px 16px;
+}
+
+@media (max-width: 720px) {
+  .adm-formgrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.adm-inline {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.adm-inline--gap {
+  margin: 14px 0 18px;
+}
+
+.adm-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13.5px;
+  color: var(--text);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+/* 하단 고정 액션 바 (드로어/패널 공용) */
+.adm-actionbar {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line-soft);
+}
+
+/* 목록 썸네일 */
+.adm-thumb {
+  display: inline-block;
+  width: 56px;
+  height: 38px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid var(--line-soft);
+  vertical-align: middle;
+}
+
+.adm-thumb--empty {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  color: var(--text-dim);
+  background: var(--bg-soft);
+}
+
+/* 이미지 업로드 블록 */
+.adm-imgpick {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.adm-imgpick__preview {
+  flex-shrink: 0;
+  width: 180px;
+  aspect-ratio: 3 / 2;
+  border: 1px solid var(--line-soft);
+  border-radius: 10px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-dim);
+  font-size: 12.5px;
+  background: var(--bg-soft);
+}
+
+.adm-imgpick__preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* 행 편집 리스트 (연혁) */
+.adm-panel--pad {
+  padding: 18px 20px 22px;
+}
+
+.adm-hint {
+  font-size: 13px;
+  color: var(--text-dim);
+  margin-bottom: 14px;
+  line-height: 1.7;
+}
+
+.adm-rowlist {
+  display: grid;
+  gap: 6px;
+}
+
+.adm-rowlist__grid-history {
+  display: grid;
+  grid-template-columns: 110px 70px 110px 1fr 118px;
+  gap: 6px;
+  align-items: center;
+}
+
+.adm-rowlist__head {
+  font-size: 12px;
+  color: var(--text-dim);
+  padding: 0 2px;
+}
+
+.adm-rowlist__row input {
+  width: 100%;
+  padding: 7px 9px;
+  font-size: 13px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.adm-rowlist__row input:focus {
+  outline: none;
+  border-color: var(--noble-blue);
+}
+
+.adm-rowlist__ops {
+  display: inline-flex;
+  gap: 3px;
+}
+
+.adm-rowlist__ops button {
+  width: 26px;
+  height: 26px;
+  font-size: 12px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+}
+
+.adm-rowlist__ops button:hover {
+  background: var(--bg-soft);
+  color: var(--text);
+}
+
+.adm-rowlist__ops .is-danger:hover,
+.adm-linkbtn--danger {
+  color: #d64545;
+}
+
+/* 조직도 카드 */
+.adm-orggrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.adm-orgcard {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 12px;
+  display: grid;
+  gap: 8px;
+  background: var(--bg);
+}
+
+.adm-orgcard__head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.adm-orgcard__head input {
+  flex: 1;
+  min-width: 0;
+  font-weight: 700;
+  padding: 7px 9px;
+  font-size: 13.5px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.adm-orgcard textarea {
+  width: 100%;
+  resize: vertical;
+  padding: 8px 9px;
+  font-size: 13px;
+  line-height: 1.7;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg-soft);
+  color: var(--text);
+}
+
+.adm-orgcard--add {
+  align-items: center;
+  justify-items: center;
+  border-style: dashed;
+  color: var(--text-dim);
+  cursor: pointer;
+  font-size: 13.5px;
+  min-height: 120px;
+}
+
+.adm-orgcard--add:hover {
+  color: var(--noble-blue);
+  border-color: var(--noble-blue);
+}
+
+/* 클라이언트 칩 그리드 */
+.adm-clientgrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.adm-clientchip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px 6px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-size: 13px;
+  background: var(--bg);
+}
+
+.adm-clientchip.is-hidden {
+  opacity: 0.45;
+}
+
+.adm-clientchip label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.adm-clientchip button {
+  border: 0;
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+  font-size: 12px;
+  padding: 2px 4px;
+}
+
+/* 토글 스위치 */
+.adm-togglelist {
+  display: grid;
+  gap: 4px;
+}
+
+.adm-togglelist__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 4px;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.adm-togglelist__row:last-child {
+  border-bottom: 0;
+}
+
+.adm-togglelist__row p {
+  font-size: 13px;
+  margin-top: 2px;
+}
+
+.adm-switch {
+  flex-shrink: 0;
+  width: 46px;
+  height: 26px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--bg-soft);
+  position: relative;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.adm-switch i {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--text-dim);
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.adm-switch.is-on {
+  background: var(--noble-blue);
+  border-color: var(--noble-blue);
+}
+
+.adm-switch.is-on i {
+  transform: translateX(20px);
+  background: #fff;
+}
+
+.adm-switch:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* 설정 페이지 인라인 서브폼·미리보기 */
+.adm-subform {
+  margin-top: 14px;
+  padding: 16px;
+  border: 1px dashed var(--line);
+  border-radius: 12px;
+  background: var(--bg-soft);
+}
+
+.adm-popup-preview {
+  display: block;
+  margin-top: 8px;
+  max-width: 260px;
+  border-radius: 10px;
+  border: 1px solid var(--line-soft);
+}
+
+/* 알림 비어있음 */
+.adm-bell__empty {
+  padding: 18px 14px;
+  font-size: 13px;
+  color: var(--text-dim);
+  text-align: center;
+}
