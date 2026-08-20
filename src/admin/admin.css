@@ -1552,3 +1552,58 @@
     gap: 6px;
   }
 }
+
+/* ---------- 사이트 진단 리포트 ---------- */
+
+.adm-grade {
+  font-weight: 900;
+  background: rgba(46, 128, 232, 0.12);
+  color: var(--accent-text);
+}
+
+.adm-grade--D,
+.adm-grade--F {
+  background: rgba(214, 69, 69, 0.12);
+  color: #d64545;
+}
+
+.adm-checklist {
+  display: grid;
+  gap: 8px;
+  list-style: none;
+}
+
+.adm-checkitem {
+  display: flex;
+  gap: 12px;
+  align-items: baseline;
+  padding: 10px 12px;
+  border-radius: 9px;
+  border: 1px solid var(--line-soft);
+  font-size: 13.5px;
+}
+
+.adm-checkitem > b { flex-shrink: 0; width: 34px; }
+.adm-checkitem--pass > b { color: #2e9e5b; }
+.adm-checkitem--warn > b { color: #b87d0a; }
+.adm-checkitem--fail > b { color: #d64545; }
+.adm-checkitem--warn { background: rgba(240, 173, 45, 0.06); }
+.adm-checkitem--fail { background: rgba(214, 69, 69, 0.06); }
+
+.adm-checkitem__label { font-weight: 700; }
+
+.adm-checkitem__advice {
+  margin-top: 4px;
+  color: var(--text-dim);
+}
+
+.adm-checkitem__evidence {
+  margin-top: 6px;
+  padding: 8px 10px;
+  border-radius: 7px;
+  background: var(--bg-soft);
+  font-size: 12px;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+}

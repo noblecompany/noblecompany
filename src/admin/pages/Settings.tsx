@@ -4,6 +4,8 @@ import {
   adminUpload,
   formatBytes,
   formatDate,
+  imageExt,
+  resizeImage,
   type AdminBrochure,
   type AdminPopup,
 } from "../api";
@@ -210,7 +212,13 @@ function PopupForm({ onClose, onSaved }: { onClose: () => void; onSaved: () => v
     setUploading(true);
     setErr(null);
     try {
-      const up = await adminUpload("site-assets", file, file.name);
+      // jpg·png 는 WebP 로 리사이즈·압축해서 올린다 (gif 애니메이션 등은 원본 유지)
+      const convertible = file.type === "image/jpeg" || file.type === "image/png";
+      const blob = convertible ? await resizeImage(file, 1600) : file;
+      const name = convertible
+        ? `${file.name.replace(/\.[^.]+$/, "")}.${imageExt(blob)}`
+        : file.name;
+      const up = await adminUpload("site-assets", blob, name);
       setImagePath(up.publicUrl);
     } catch (e) {
       setErr((e as Error).message);

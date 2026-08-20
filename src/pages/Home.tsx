@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Accordion from "../components/Accordion";
+import ClientsBand from "../components/ClientsBand";
 import PortfolioScroll from "../components/PortfolioScroll";
 import Reveal from "../components/Reveal";
 import { asset } from "../lib/asset";
@@ -21,7 +22,7 @@ const HERO_MEDIA = {
   video: "/hero-veil.mp4",
   // 원본: https://e-noble.kr/superboard/data/siteconfig/20260323141812_69c0cd1426e0f_....png
   // (흰 배경 제거 + 다크 배경용 흰색 텍스트 변환본, public/에 로컬 보관)
-  logo: "/logo-noble-white.png",
+  logo: "/logo-noble-white.webp",
 };
 
 /** 배경 재생용 유튜브 파라미터 — 자동재생·무음·무한루프·UI 제거 */
@@ -254,6 +255,9 @@ export default function Home() {
 
       {/* 3. 대표 포트폴리오 — 좌측 고정 텍스트 + 우측 스크롤 연동 그리드 (슬라이드 8, PLAY.D 레퍼런스) */}
       <PortfolioScroll />
+
+      {/* 3.5 클라이언트 롤링 밴드 — 슬라이드 9, 목록은 어드민(클라이언트 관리)에서 편집 */}
+      <ClientsBand />
 
       {/* 4. 성과/권위 증명 — 슬라이드 10~11 */}
       <section className="section" style={{ background: "var(--noble-black-soft)" }}>

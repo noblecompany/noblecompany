@@ -8,6 +8,7 @@ import { adminApi, timeAgo, type AdminNotification } from "./api";
 const MENU: Array<{ to: string; label: string; icon: ReactNode }> = [
   { to: "/admin", label: "대시보드", icon: <IconGrid /> },
   { to: "/admin/inquiries", label: "문의 관리", icon: <IconMail /> },
+  { to: "/admin/audits", label: "사이트 진단", icon: <IconScan /> },
   { to: "/admin/applications", label: "지원자 관리", icon: <IconUsers /> },
   { to: "/admin/jobs", label: "채용공고", icon: <IconFile /> },
   { to: "/admin/works", label: "포트폴리오", icon: <IconImage /> },
@@ -18,6 +19,7 @@ const MENU: Array<{ to: string; label: string; icon: ReactNode }> = [
 const TITLE: Record<string, string> = {
   "/admin": "대시보드",
   "/admin/inquiries": "문의 관리",
+  "/admin/audits": "사이트 진단",
   "/admin/applications": "지원자 관리",
   "/admin/jobs": "채용공고",
   "/admin/works": "포트폴리오",
@@ -277,6 +279,15 @@ function IconGear() {
     <svg {...p} aria-hidden="true">
       <circle cx="12" cy="12" r="3" />
       <path d="M12 2.8v3M12 18.2v3M2.8 12h3M18.2 12h3M5.5 5.5l2.1 2.1M16.4 16.4l2.1 2.1M18.5 5.5l-2.1 2.1M7.6 16.4l-2.1 2.1" />
+    </svg>
+  );
+}
+function IconScan() {
+  return (
+    <svg {...p} aria-hidden="true">
+      <circle cx="11" cy="11" r="6" />
+      <path d="m20 20-4.5-4.5" />
+      <path d="M8.5 11h5M11 8.5v5" />
     </svg>
   );
 }

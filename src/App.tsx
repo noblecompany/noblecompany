@@ -8,6 +8,7 @@ import About from "./pages/About";
 import CareerDetail from "./pages/CareerDetail";
 import Careers from "./pages/Careers";
 import Contact from "./pages/Contact";
+import Diagnosis from "./pages/Diagnosis";
 import EmailPolicy from "./pages/EmailPolicy";
 import Home from "./pages/Home";
 import Privacy from "./pages/Privacy";
@@ -40,6 +41,7 @@ export default function App() {
         <Route path="/work" element={<Work />} />
         <Route path="/work/:id" element={<WorkDetail />} />
         <Route path="/solution" element={<Solution />} />
+        <Route path="/diagnosis" element={<Diagnosis />} />
         <Route path="/about" element={<About />} />
         {/* 소개/비전/연혁 탭을 경로로 둬 공유·뒤로가기가 동작하게 한다 */}
         <Route path="/about/:tab" element={<About />} />

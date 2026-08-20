@@ -44,7 +44,7 @@ export default function Header() {
           {/* 라이트 테마의 흰 배경에서는 화이트 로고가 보이지 않는다 */}
           <img
             src={asset(
-              overHero || theme === "dark" ? "/logo-noble-white.png" : "/logo-noble.png",
+              overHero || theme === "dark" ? "/logo-noble-white.webp" : "/logo-noble.webp",
             )}
             alt="noble company"
           />
@@ -61,38 +61,20 @@ export default function Header() {
             </NavLink>
           ))}
 
-          {/* 별도 사이트로 나가므로 새 탭에서 연다 */}
-          <a
-            className="header__cta"
-            href={DESIGN_PORTFOLIO_URL}
-            target="_blank"
-            rel="noreferrer"
-          >
-            디자인 포트폴리오
-            <svg
-              width="13"
-              height="13"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.4"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-            >
-              <path d="M8 6h10v10" />
-              <path d="M18 6 6 18" />
-            </svg>
-          </a>
+          {/* 모바일 드롭다운용 세그먼트 (데스크톱에서는 숨김) */}
+          <SegButtons className="header__seg--menu" />
         </nav>
 
-        <button
-          type="button"
-          className="header__theme"
-          onClick={toggle}
-          aria-label={theme === "dark" ? "라이트 모드로 전환" : "다크 모드로 전환"}
-          title={theme === "dark" ? "라이트 모드" : "다크 모드"}
-        >
+        {/* 우측 액션 클러스터 — 세그먼트 CTA + 테마 토글을 한 묶음으로 */}
+        <div className="header__actions">
+          <SegButtons className="header__seg--bar" />
+          <button
+            type="button"
+            className="header__theme"
+            onClick={toggle}
+            aria-label={theme === "dark" ? "라이트 모드로 전환" : "다크 모드로 전환"}
+            title={theme === "dark" ? "라이트 모드" : "다크 모드"}
+          >
           {theme === "dark" ? (
             /* 해 — 누르면 라이트로 */
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
@@ -105,7 +87,8 @@ export default function Header() {
               <path d="M20.5 14.2A8.5 8.5 0 1 1 9.8 3.5a6.8 6.8 0 0 0 10.7 10.7z" />
             </svg>
           )}
-        </button>
+          </button>
+        </div>
 
         <button
           type="button"
@@ -131,5 +114,57 @@ export default function Header() {
         </button>
       </div>
     </header>
+  );
+}
+
+/** AEO 무료진단(내부) + 디자인 포트폴리오(외부) 세그먼트 CTA — 데스크톱 바·모바일 메뉴 양쪽에서 재사용 */
+function SegButtons({ className = "" }: { className?: string }) {
+  return (
+    <div className={`header__seg ${className}`}>
+      <NavLink
+        to="/diagnosis"
+        className={({ isActive }) =>
+          `header__seg-btn header__seg-btn--diag ${isActive ? "is-active" : ""}`
+        }
+      >
+        <svg
+          width="13"
+          height="13"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.4"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <circle cx="11" cy="11" r="7" />
+          <path d="m20.5 20.5-4.2-4.2" />
+        </svg>
+        AEO 무료진단
+      </NavLink>
+      <a
+        className="header__seg-btn header__seg-btn--design"
+        href={DESIGN_PORTFOLIO_URL}
+        target="_blank"
+        rel="noreferrer"
+      >
+        디자인 포트폴리오
+        <svg
+          width="13"
+          height="13"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.4"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M8 6h10v10" />
+          <path d="M18 6 6 18" />
+        </svg>
+      </a>
+    </div>
   );
 }

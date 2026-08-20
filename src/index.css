@@ -288,24 +288,68 @@ img {
   gap: 34px;
 }
 
-/* 외부 사이트로 나가는 CTA — 메뉴 링크와 구분되게 채운 알약으로 둔다 */
-.header__cta {
+/* 우측 액션 클러스터 — 세그먼트 CTA + 테마 토글 묶음 */
+.header__actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: 26px;
+  flex: 0 0 auto;
+}
+
+.header__actions .header__theme {
+  margin-left: 0;
+}
+
+/* 모바일 메뉴용 복제는 데스크톱에서 숨긴다
+   (.header__seg 의 display 선언보다 우선하도록 클래스 2개로 특이도를 올린다) */
+.header__seg.header__seg--menu {
+  display: none;
+}
+
+/* 액션 CTA 세그먼트 — AEO 무료진단·디자인 포트폴리오를 한 알약에 서로 다른 색으로 */
+.header__seg {
+  display: inline-flex;
+  align-items: stretch;
+  border-radius: 999px;
+  overflow: hidden;
+  transition: transform 0.2s ease;
+}
+
+.header__seg:hover {
+  transform: translateY(-1px);
+}
+
+.header__seg-btn {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 9px 18px;
-  border-radius: 999px;
-  background: var(--noble-blue);
-  color: var(--on-accent);
-  font-size: 14px;
+  padding: 9px 16px;
+  font-size: 13.5px;
   font-weight: 800;
   white-space: nowrap;
-  transition: background 0.2s ease, transform 0.2s ease;
+  transition: background 0.2s ease, opacity 0.2s ease;
 }
 
-.header__cta:hover {
+/* 좌: AEO 무료진단 — 노블 블루 */
+.header__seg-btn--diag {
+  background: var(--noble-blue);
+  color: var(--on-accent);
+}
+
+.header__seg-btn--diag:hover,
+.header__seg-btn--diag.is-active {
   background: var(--noble-blue-bright);
-  transform: translateY(-1px);
+}
+
+/* 우: 디자인 포트폴리오 — 테마 반전색(다크선 흰 배지, 라이트선 잉크 배지) */
+.header__seg-btn--design {
+  background: var(--text);
+  color: var(--bg);
+}
+
+.header__seg-btn--design:hover {
+  opacity: 0.85;
 }
 
 .header__link {
@@ -2464,21 +2508,31 @@ img {
     display: none;
   }
 
-  /* 드롭다운 안에서는 폭을 꽉 채운 버튼으로 */
-  .header__cta {
+  /* 모바일: 상단 바에는 세그먼트를 숨기고 드롭다운 안에서 폭을 꽉 채워 보여준다 */
+  .header__seg.header__seg--bar {
+    display: none;
+  }
+
+  .header__seg.header__seg--menu {
+    display: inline-flex;
     margin-top: 18px;
+    width: 100%;
+  }
+
+  .header__seg-btn {
+    flex: 1;
     justify-content: center;
-    padding: 14px 18px;
-    font-size: 15px;
+    padding: 14px 10px;
+    font-size: 14.5px;
   }
 
   .header__toggle {
     display: block;
   }
 
-  /* nav 가 드롭다운으로 빠지면 로고·테마·햄버거만 남아 space-between 이
-     테마 버튼을 한가운데로 밀어낸다. 오른쪽 햄버거 옆에 붙인다. */
-  .header__theme {
+  /* nav 가 드롭다운으로 빠지면 로고·액션·햄버거만 남아 space-between 이
+     액션 묶음을 한가운데로 밀어낸다. 오른쪽 햄버거 옆에 붙인다. */
+  .header__actions {
     margin-left: auto;
     margin-right: 6px;
   }
@@ -2864,4 +2918,323 @@ img {
 
 .faq__answer p + p {
   margin-top: 10px;
+}
+
+/* ============================================================
+   무료 사이트 진단 (AEO·GEO) — /diagnosis
+   ============================================================ */
+
+.diag-form {
+  display: flex;
+  gap: 12px;
+  margin-top: 34px;
+  max-width: 640px;
+  position: relative;
+}
+
+.diag-form__input {
+  flex: 1;
+  min-width: 0;
+  padding: 14px 18px;
+  font-size: 16px;
+  border: 2px solid var(--line-strong);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--text);
+  outline: none;
+}
+
+.diag-form__input:focus {
+  border-color: var(--noble-blue);
+}
+
+.diag-progress {
+  margin-top: 14px;
+  font-size: 14px;
+  color: var(--text-dim);
+}
+
+.diag-error {
+  margin-top: 14px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #d64545;
+}
+
+.diag-grade {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  margin: 40px 0 26px;
+  flex-wrap: wrap;
+}
+
+.diag-grade__circle {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 56px;
+  font-weight: 900;
+  color: var(--accent-text);
+  border: 3px solid var(--noble-blue);
+  background: rgba(46, 128, 232, 0.08);
+  flex-shrink: 0;
+}
+
+.diag-grade__circle--D,
+.diag-grade__circle--F {
+  color: #d64545;
+  border-color: #d64545;
+  background: rgba(214, 69, 69, 0.08);
+}
+
+.diag-grade__comment {
+  font-size: 22px;
+  font-weight: 800;
+  display: block;
+}
+
+.diag-grade__meta {
+  margin-top: 6px;
+  color: var(--text-dim);
+  font-size: 14px;
+}
+
+.diag-counts {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
+
+.diag-count {
+  padding: 7px 14px;
+  border-radius: 999px;
+  font-size: 13.5px;
+  font-weight: 800;
+  border: 1px solid;
+}
+
+.diag-count--pass { color: #2e9e5b; border-color: rgba(46, 158, 91, 0.4); background: rgba(46, 158, 91, 0.09); }
+.diag-count--warn { color: #b87d0a; border-color: rgba(240, 173, 45, 0.45); background: rgba(240, 173, 45, 0.1); }
+.diag-count--fail { color: #d64545; border-color: rgba(214, 69, 69, 0.4); background: rgba(214, 69, 69, 0.08); }
+
+.diag-cats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 26px;
+}
+
+.diag-cat {
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  padding: 16px;
+  display: grid;
+  gap: 4px;
+  text-align: center;
+}
+
+.diag-cat b { font-size: 17px; font-weight: 900; }
+.diag-cat span { font-size: 13px; color: var(--text-dim); }
+.diag-cat--pass b { color: #2e9e5b; }
+.diag-cat--warn b { color: #b87d0a; }
+.diag-cat--fail b { color: #d64545; }
+
+.diag-panel {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 22px 24px;
+  margin-bottom: 20px;
+  overflow-x: auto;
+}
+
+.diag-panel h3 {
+  font-size: 18px;
+  font-weight: 800;
+  margin-bottom: 14px;
+}
+
+.diag-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  min-width: 480px;
+}
+
+.diag-table th {
+  text-align: left;
+  font-size: 12.5px;
+  color: var(--text-dim);
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--line);
+}
+
+.diag-table td {
+  padding: 10px;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.diag-right { text-align: right; }
+.diag-dim { color: var(--text-dim); }
+
+.diag-locked {
+  margin-top: 14px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  background: var(--bg-soft);
+  border: 1px dashed var(--line-strong);
+  font-size: 13.5px;
+  color: var(--text-dim);
+}
+
+.diag-issues {
+  display: grid;
+  gap: 10px;
+  list-style: none;
+}
+
+.diag-issue {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 13px 16px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  font-size: 14.5px;
+  flex-wrap: wrap;
+}
+
+.diag-issue b { flex-shrink: 0; font-weight: 900; }
+.diag-issue--warn b { color: #b87d0a; }
+.diag-issue--fail b { color: #d64545; }
+.diag-issue em { font-style: normal; color: var(--text-dim); font-size: 13px; }
+
+.diag-issue--locked {
+  border-style: dashed;
+  color: var(--text-dim);
+  background: var(--bg-soft);
+}
+
+.diag-cta {
+  margin-top: 10px;
+  padding: 34px 30px;
+  border-radius: 18px;
+  background: rgba(46, 128, 232, 0.08);
+  border: 1px solid rgba(46, 128, 232, 0.3);
+  text-align: center;
+}
+
+.diag-cta h3 { font-size: 22px; font-weight: 900; margin-bottom: 10px; }
+.diag-cta p { color: var(--text-dim); margin-bottom: 20px; line-height: 1.7; }
+
+@media (max-width: 860px) {
+  .diag-form { flex-direction: column; }
+  .diag-cats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .diag-grade { gap: 20px; }
+  .diag-grade__circle { width: 110px; height: 110px; font-size: 44px; }
+}
+
+/* NRS 점수 + AI 브리핑 (프리미엄 지표) */
+.diag-ars {
+  display: flex;
+  gap: 34px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.diag-ars__score {
+  flex-shrink: 0;
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  min-width: 150px;
+}
+
+.diag-ars__score strong {
+  font-size: 52px;
+  font-weight: 900;
+  color: var(--accent-text);
+  line-height: 1;
+}
+
+.diag-ars__score span {
+  color: var(--text-dim);
+  font-size: 14px;
+}
+
+.diag-ars__score em {
+  margin-top: 10px;
+  font-style: normal;
+  font-size: 12.5px;
+  color: var(--text-dim);
+  text-align: center;
+  line-height: 1.6;
+}
+
+.diag-ars__score em b {
+  color: #2e9e5b;
+}
+
+.diag-ars__cats {
+  flex: 1;
+  min-width: 260px;
+  display: grid;
+  gap: 10px;
+}
+
+.diag-ars__row {
+  display: grid;
+  grid-template-columns: 120px 1fr 70px;
+  align-items: center;
+  gap: 12px;
+  font-size: 13.5px;
+}
+
+.diag-ars__row span { color: var(--text-dim); }
+.diag-ars__row b { text-align: right; font-weight: 800; }
+
+.diag-ars__bar {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--bg-soft);
+  overflow: hidden;
+}
+
+.diag-ars__bar i {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--noble-blue);
+}
+
+.diag-ai {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.diag-ai__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  font-size: 13.5px;
+}
+
+.diag-ai__chip b { font-weight: 900; font-size: 12.5px; }
+.diag-ai__chip--pass b { color: #2e9e5b; }
+.diag-ai__chip--missing b { color: #d64545; }
+.diag-ai__chip--na b { color: var(--text-dim); }
+.diag-ai__chip--na { opacity: 0.6; }
+
+@media (max-width: 640px) {
+  .diag-ars__row { grid-template-columns: 96px 1fr 62px; }
 }

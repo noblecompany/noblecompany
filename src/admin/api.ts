@@ -80,9 +80,13 @@ export async function adminUpload(
 
 /**
  * 이미지 리사이즈 (F5 — sm/lg 자동 생성).
- * 브라우저 canvas 로 최대 폭에 맞춰 축소한 JPEG Blob 을 만든다.
+ * 브라우저 canvas 로 최대 폭에 맞춰 축소한 WebP Blob 을 만든다.
+ * WebP 인코딩이 안 되는 브라우저(구형 Safari)는 JPEG 로 폴백 — 확장자는 imageExt() 로 결정.
  */
-export function resizeImage(file: File, maxWidth: number, quality = 0.85): Promise<Blob> {
+export const imageExt = (blob: Blob): "webp" | "jpg" =>
+  blob.type === "image/webp" ? "webp" : "jpg";
+
+export function resizeImage(file: File, maxWidth: number, quality = 0.82): Promise<Blob> {
   return new Promise((resolve, reject) => {
     const img = new Image();
     const url = URL.createObjectURL(file);
@@ -96,8 +100,15 @@ export function resizeImage(file: File, maxWidth: number, quality = 0.85): Promi
       if (!ctx) return reject(new Error("canvas 미지원 브라우저입니다."));
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
       canvas.toBlob(
-        (blob) => (blob ? resolve(blob) : reject(new Error("이미지 변환 실패"))),
-        "image/jpeg",
+        (blob) => {
+          if (blob && blob.type === "image/webp") return resolve(blob);
+          canvas.toBlob(
+            (jpeg) => (jpeg ? resolve(jpeg) : reject(new Error("이미지 변환 실패"))),
+            "image/jpeg",
+            quality,
+          );
+        },
+        "image/webp",
         quality,
       );
     };

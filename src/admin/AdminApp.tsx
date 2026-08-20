@@ -4,6 +4,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import { supabase } from "../lib/supabaseClient";
 import AdminLayout from "./AdminLayout";
 import Applications from "./pages/Applications";
+import Audits from "./pages/Audits";
 import Dashboard from "./pages/Dashboard";
 import Inquiries from "./pages/Inquiries";
 import Jobs from "./pages/Jobs";
@@ -64,6 +65,7 @@ export default function AdminApp() {
         <Route path="/" element={<Dashboard />} />
         <Route path="/inquiries" element={<Inquiries />} />
         <Route path="/applications" element={<Applications />} />
+        <Route path="/audits" element={<Audits />} />
         <Route path="/jobs" element={<Jobs />} />
         <Route path="/works" element={<Works />} />
         <Route path="/site" element={<SiteContent />} />

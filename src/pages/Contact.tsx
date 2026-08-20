@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from "react";
+import { useSearchParams } from "react-router-dom";
 import { ActionButton } from "seed-design/ui/action-button";
 import { TextField, TextFieldInput } from "seed-design/ui/text-field";
 import BrochureCta from "../components/BrochureCta";
@@ -13,6 +14,7 @@ const INQUIRY_TYPES = [
   "콘텐츠 제작",
   "바이럴",
   "BTL",
+  "사이트 진단",
   "기타",
 ];
 
@@ -43,7 +45,26 @@ const INITIAL: FormState = {
 };
 
 export default function Contact() {
-  const [form, setForm] = useState<FormState>(INITIAL);
+  // 무료 진단(/diagnosis)에서 넘어오면 진단 URL·리포트 ID 를 문의 내용에 미리 채운다
+  const [params] = useSearchParams();
+  const [form, setForm] = useState<FormState>(() => {
+    const diagUrl = params.get("diag");
+    if (!diagUrl) return INITIAL;
+    const audit = params.get("audit");
+    return {
+      ...INITIAL,
+      types: ["사이트 진단"],
+      message: [
+        `[무료 사이트 진단 상담 신청]`,
+        `진단 URL: ${diagUrl}`,
+        audit ? `리포트 번호: ${audit}` : null,
+        "",
+        "전체 진단 리포트와 개선 방안 상담을 요청합니다.",
+      ]
+        .filter((v): v is string => v !== null)
+        .join("\n"),
+    };
+  });
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState(false);
   const [busy, setBusy] = useState(false);

@@ -66,6 +66,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return await stats(ctx);
       case "uploads":
         return await uploads(ctx);
+      case "audits":
+        return await audits(ctx, id);
       case "export":
         return await exportCsv(ctx);
       case "me":
@@ -782,6 +784,46 @@ async function uploads({ req, res, db, user }: Ctx) {
 
   const { data: pub } = db.storage.from(p.data.bucket).getPublicUrl(path);
   return ok(res, { path, token: data.token, signedUrl: data.signedUrl, publicUrl: pub.publicUrl });
+}
+
+/* ================================================= 사이트 진단 결과 (owner·sales) */
+
+async function audits({ req, res, db, user }: Ctx, id?: string) {
+  if (!hasRole(user, ["sales"])) return forbidden(res);
+
+  if (req.method === "GET" && !id) {
+    const { data, error } = await db
+      .from("seo_audits")
+      .select("id, url, final_url, page_title, grade, pass_count, warn_count, fail_count, categories, created_at")
+      .order("created_at", { ascending: false })
+      .limit(300);
+    if (error) throw error;
+    return ok(res, (data ?? []).map((a) => ({
+      id: a.id, url: a.url, finalUrl: a.final_url, pageTitle: a.page_title, grade: a.grade,
+      passCount: a.pass_count, warnCount: a.warn_count, failCount: a.fail_count,
+      categories: a.categories, createdAt: a.created_at,
+    })));
+  }
+
+  if (req.method === "GET" && id) {
+    const { data, error } = await db.from("seo_audits").select("*").eq("id", id).maybeSingle();
+    if (error) throw error;
+    if (!data) return notFound(res);
+    return ok(res, {
+      id: data.id, url: data.url, finalUrl: data.final_url, pageTitle: data.page_title,
+      grade: data.grade, passCount: data.pass_count, warnCount: data.warn_count,
+      failCount: data.fail_count, categories: data.categories, checks: data.checks,
+      keywords: data.keywords, meta: data.meta, ip: data.ip, createdAt: data.created_at,
+    });
+  }
+
+  if (req.method === "DELETE" && id) {
+    const { error } = await db.from("seo_audits").delete().eq("id", id);
+    if (error) throw error;
+    return ok(res);
+  }
+
+  return methodNa(res);
 }
 
 /* ================================================= CSV 내보내기 (owner, §7-8) */

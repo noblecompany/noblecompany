@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { adminApi, adminUpload, resizeImage, type AdminWork } from "../api";
+import { adminApi, adminUpload, imageExt, resizeImage, type AdminWork } from "../api";
 
 const CATEGORIES: AdminWork["category"][] = ["IMC", "SA", "DA", "VIRAL"];
 
@@ -204,8 +204,8 @@ function Editor({
       const [sm, lg] = await Promise.all([resizeImage(file, 640), resizeImage(file, 1600)]);
       const base = file.name.replace(/\.[^.]+$/, "");
       const [smUp, lgUp] = await Promise.all([
-        adminUpload("portfolio", sm, `${base}-sm.jpg`),
-        adminUpload("portfolio", lg, `${base}-lg.jpg`),
+        adminUpload("portfolio", sm, `${base}-sm.${imageExt(sm)}`),
+        adminUpload("portfolio", lg, `${base}-lg.${imageExt(lg)}`),
       ]);
       setF((prev) => ({ ...prev, thumbPath: smUp.publicUrl, heroPath: lgUp.publicUrl }));
     } catch (e) {
