@@ -488,117 +488,98 @@ img {
 }
 
 /* ===== 나비 플로팅 CTA ===== */
-/* ===== 플로팅 퀵메뉴 (나비 버튼 축 궤도 펼침) ===== */
-.qmenu {
+/* ===== 퀵 도크 (우측 하단 상시 노출) ===== */
+.qdock {
   position: fixed;
-  right: 28px;
-  bottom: 28px;
+  right: 26px;
+  bottom: 26px;
   z-index: 90;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+  width: 196px;
 }
 
-/* 펼쳐지는 메뉴 — 나비 버튼 중심을 축으로 회전하며 제자리로 (자전 모션) */
-.qmenu__item {
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  display: inline-flex;
+.qdock__item {
+  display: flex;
   align-items: center;
-  gap: 9px;
-  padding: 15px 27px;
-  border-radius: 999px;
+  gap: 11px;
+  padding: 13px 16px;
+  border-radius: 14px;
   border: 1px solid var(--line);
-  background: var(--surface);
+  background: color-mix(in srgb, var(--surface) 82%, transparent);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
   color: var(--text);
-  font-size: 16.5px;
+  font-size: 15px;
   font-weight: 800;
   white-space: nowrap;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.28);
+  box-shadow: 0 8px 26px rgba(0, 0, 0, 0.16);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
   opacity: 0;
-  pointer-events: none;
-  transform-origin: calc(100% - 31px) calc(100% - 31px);
-  transform: rotate(75deg) translate(var(--qx), var(--qy)) rotate(-75deg) scale(0.4);
-  transition: transform 0.45s cubic-bezier(0.22, 1.1, 0.32, 1.15), opacity 0.3s ease;
+  animation: qdock-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
-.qmenu__item svg {
-  width: 19px;
-  height: 19px;
+.qdock__item:nth-child(1) { animation-delay: 0.15s; }
+.qdock__item:nth-child(2) { animation-delay: 0.25s; }
+.qdock__item:nth-child(3) { animation-delay: 0.35s; }
+
+@keyframes qdock-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.qmenu__item--diag {
-  --qx: -14px;
-  --qy: -154px;
-  background: var(--noble-blue);
-  border-color: var(--noble-blue);
-  color: var(--on-accent);
+.qdock__item:hover {
+  transform: translateX(-5px);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.24);
 }
 
-.qmenu__item--contact {
-  --qx: -46px;
-  --qy: -96px;
-  transition-delay: 0.05s;
+/* 아이콘 원판 — 항목 색과 어우러지는 반투명 배지 */
+.qdock__ico {
+  flex: 0 0 auto;
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(46, 128, 232, 0.14);
+  color: var(--accent-text);
 }
 
-/* 헤더의 디자인 포트폴리오 버튼과 동일한 테마 반전색 — 라이트: 잉크 블랙 / 다크: 화이트 */
-.qmenu__item--design {
-  --qx: -100px;
-  --qy: -20px;
+.qdock__item--diag {
+  background: linear-gradient(135deg, var(--noble-blue), var(--noble-blue-deep));
+  border-color: transparent;
+  color: #fff;
+}
+
+.qdock__item--diag .qdock__ico {
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+}
+
+/* 헤더의 디자인 포트폴리오와 동일한 테마 반전색 — 라이트: 블랙 / 다크: 화이트 */
+.qdock__item--design {
   background: var(--text);
   border-color: transparent;
   color: var(--bg);
-  transition-delay: 0.1s;
 }
 
-.qmenu.is-open .qmenu__item {
-  opacity: 1;
-  pointer-events: auto;
-  transform: rotate(0deg) translate(var(--qx), var(--qy)) rotate(0deg) scale(1);
+.qdock__item--design .qdock__ico {
+  background: color-mix(in srgb, var(--bg) 16%, transparent);
+  color: var(--bg);
 }
 
-.qmenu__item:hover {
-  filter: brightness(1.08);
-}
-
-.qmenu__fab {
-  position: relative;
-  z-index: 1;
-  border: 0;
-  cursor: pointer;
-  width: 62px;
-  height: 62px;
-  border-radius: 50%;
-  background: var(--noble-blue);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 8px 28px rgba(46, 128, 232, 0.45);
-  transition: transform 0.25s ease, background 0.25s ease;
-  animation: butterfly-float 3.2s ease-in-out infinite;
-}
-
-.qmenu__fab:hover {
-  background: var(--noble-blue-bright);
-}
-
-.qmenu__fab svg {
-  width: 30px;
-  height: 30px;
-  transition: transform 0.45s cubic-bezier(0.22, 1.1, 0.32, 1.15);
-}
-
-/* 열림 상태 — 나비가 함께 자전 */
-.qmenu.is-open .qmenu__fab svg {
-  transform: rotate(130deg) scale(0.92);
-}
-
-@keyframes butterfly-float {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-7px);
-  }
+.qdock__ext {
+  margin-left: auto;
+  opacity: 0.7;
 }
 
 /* ===== 히어로 ===== */
@@ -2753,32 +2734,23 @@ img {
     padding: 24px 20px;
   }
 
-  /* 모바일: 나비 토글 없이 버튼 두 개를 상시 노출 */
-  .qmenu {
+  /* 모바일 퀵 도크 — 컴팩트 */
+  .qdock {
     right: 14px;
     bottom: 16px;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 9px;
+    width: 176px;
+    gap: 8px;
   }
 
-  .qmenu__fab {
-    display: none;
+  .qdock__item {
+    padding: 11px 13px;
+    font-size: 13.5px;
+    border-radius: 12px;
   }
 
-  /* is-open 상태의 궤도 transform(.qmenu.is-open .qmenu__item)보다 우선하도록
-     동일 이상 특이도의 선택자로 정적 배치를 강제한다 */
-  .qmenu .qmenu__item,
-  .qmenu.is-open .qmenu__item {
-    position: static;
-    opacity: 1;
-    pointer-events: auto;
-    transform: none;
-    transition: none;
-    padding: 13px 20px;
-    font-size: 15px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+  .qdock__ico {
+    width: 26px;
+    height: 26px;
   }
 
   /* 모바일은 카피가 화면 폭을 거의 다 쓰므로 좌측 집중 그라디언트가 안 먹는다.
