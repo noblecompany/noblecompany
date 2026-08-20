@@ -1,5 +1,6 @@
 import Reveal from "../components/Reveal";
 import { PARTNER_EMAIL, RECRUIT_EMAIL, SALES_EMAIL, SALES_TEL } from "../data/company";
+import { useSeo } from "../lib/seo";
 
 /**
  * 개인정보처리방침 (F12) — 접수 기능 오픈 전 게시 의무.
@@ -145,6 +146,10 @@ const SECTIONS: { title: string; body: React.ReactNode }[] = [
 ];
 
 export default function Privacy() {
+  useSeo({
+    title: "개인정보처리방침",
+    description: "주식회사 노블컴퍼니의 개인정보 수집·이용·보관·파기에 관한 처리방침입니다.",
+  });
   return (
     <main>
       <section className="page-hero" style={{ paddingBottom: 30 }}>

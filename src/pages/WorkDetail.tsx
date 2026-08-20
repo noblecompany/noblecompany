@@ -2,12 +2,24 @@ import { Link, Navigate, useParams } from "react-router-dom";
 import Reveal from "../components/Reveal";
 import { asset } from "../lib/asset";
 import { useWorks } from "../lib/content";
+import { useSeo } from "../lib/seo";
 
 /** 슬라이드 35~36 — 상세: Situation / Solution / Result 케이스 스터디 */
 export default function WorkDetail() {
   const { id } = useParams<{ id: string }>();
   const { works, loading } = useWorks();
   const work = works.find((w) => w.id === id);
+
+  useSeo(
+    work
+      ? {
+          title: `${work.client} ${work.category} 캠페인`,
+          description: `${work.client} ${work.category} 캠페인 사례 — ${work.objective}`.slice(0, 160),
+          image: work.hero,
+          ogType: "article",
+        }
+      : {},
+  );
 
   if (!work) {
     // 목록을 아직 불러오는 중이면 판단을 미룬다 — 새로고침 직후 잘못된 리다이렉트 방지

@@ -4,6 +4,7 @@ import Reveal from "../components/Reveal";
 import { companyInfo } from "../data/company";
 import { asset } from "../lib/asset";
 import { useSiteContent } from "../lib/content";
+import { ORGANIZATION_JSONLD, useSeo } from "../lib/seo";
 
 const TABS = [
   { key: "intro", label: "소개", path: "/about" },
@@ -20,6 +21,16 @@ type TabKey = (typeof TABS)[number]["key"];
 export default function About() {
   const { tab } = useParams<{ tab?: string }>();
   const active: TabKey = TABS.some((t) => t.key === tab) ? (tab as TabKey) : "intro";
+
+  useSeo({
+    title:
+      active === "vision" ? "비전" : active === "history" ? "연혁" : "회사소개",
+    description:
+      active === "history"
+        ? "2011년 설립부터 네이버 프리미어 파트너사 선정까지 — 노블컴퍼니의 성장 연혁과 주요 인증·수상 이력."
+        : "노블컴퍼니는 데이터와 크리에이티브로 브랜드의 성장을 만드는 퍼포먼스 마케팅 기업입니다. 조직 구성과 회사 정보를 확인하세요.",
+    jsonLd: ORGANIZATION_JSONLD,
+  });
 
   return (
     <main>

@@ -5,12 +5,18 @@ import Reveal from "../components/Reveal";
 import WorkCard from "../components/WorkCard";
 import { workCategories, type WorkCategory } from "../data/works";
 import { useWorks } from "../lib/content";
+import { useSeo } from "../lib/seo";
 
 /** 그리드는 4×3 (썸네일 원본 폭 300px에 맞춰 4열 — 확대로 인한 화질 저하 방지) */
 const PER_PAGE = 12;
 
 /** 슬라이드 30~34 — WORK 메인: 유형 필터 + 그리드 + 하단 아코디언 */
 export default function Work() {
+  useSeo({
+    title: "포트폴리오",
+    description:
+      "노블컴퍼니가 집행한 IMC·검색광고·디스플레이·바이럴 캠페인 사례. 교육·병의원·커머스·패션 등 다양한 업종의 실제 광고 운영 전략을 확인하세요.",
+  });
   const [filter, setFilter] = useState<"ALL" | WorkCategory>("ALL");
   const [page, setPage] = useState(0);
   /** p33 — 유형 전환 시 페이지 리로드가 아닌 슬라이드로 넘어가는 연출 */

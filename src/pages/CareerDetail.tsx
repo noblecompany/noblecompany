@@ -4,6 +4,7 @@ import ApplyModal from "../components/ApplyModal";
 import Reveal from "../components/Reveal";
 import { deadlineLabel, hiringProcess, isClosed, RECRUIT_EMAIL } from "../data/careers";
 import { useJobs, useJobViewPing } from "../lib/content";
+import { useSeo } from "../lib/seo";
 
 /** 채용공고 상세 — 주요업무 / 자격요건 / 우대사항 / 전형절차 + 온라인 지원 (F2) */
 export default function CareerDetail() {
@@ -15,6 +16,38 @@ export default function CareerDetail() {
   useJobViewPing(id);
 
   const job = jobs.find((j) => j.id === id);
+
+  // 구글 채용 검색(JobPosting) 구조화 데이터 — 게시 중 공고만
+  useSeo(
+    job
+      ? {
+          title: `${job.title} 채용`,
+          description: `${job.summary} — ${job.team} · ${job.employment} · ${job.career}. 노블컴퍼니에서 온라인으로 바로 지원하세요.`,
+          jsonLd: {
+            "@context": "https://schema.org",
+            "@type": "JobPosting",
+            title: job.title,
+            description: [job.summary, ...job.responsibilities].join(" "),
+            employmentType: job.employment === "정규직" ? "FULL_TIME" : job.employment === "계약직" ? "CONTRACTOR" : "INTERN",
+            ...(job.deadline ? { validThrough: `${job.deadline}T23:59:59+09:00` } : {}),
+            hiringOrganization: {
+              "@type": "Organization",
+              name: "주식회사 노블컴퍼니",
+              sameAs: "https://e-noble.kr",
+            },
+            jobLocation: {
+              "@type": "Place",
+              address: {
+                "@type": "PostalAddress",
+                addressCountry: "KR",
+                addressLocality: "서울특별시 강동구",
+                streetAddress: "성내로 48 (성내동, 씨네월드) 6층",
+              },
+            },
+          },
+        }
+      : {},
+  );
 
   if (!job) {
     // 목록을 아직 불러오는 중이면 판단을 미룬다 — 새로고침 직후 잘못된 리다이렉트 방지

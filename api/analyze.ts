@@ -431,13 +431,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     { label: "성능·모바일", max: 15, ids: ["render-blocking", "viewport", "img-alt", "js-links"] },
     { label: "메타·공유·구조화", max: 15, ids: ["og", "og-image", "structured-data", "faq-schema", "favicon", "lang", "llms-txt"] },
   ];
-  const scoreOf = (s: Status) => (s === "pass" ? 1 : s === "warn" ? 0.5 : 0);
+  // 경고 감점을 크게(0.3), 비율에 지수 커브(^1.35)를 얹어 만점 근처가 쉽게 나오지 않게 한다
+  const scoreOf = (s: Status) => (s === "pass" ? 1 : s === "warn" ? 0.3 : 0);
   const arsCategories = ARS_MAP.map(({ label, max, ids }) => {
     const list = checks.filter((c) => ids.includes(c.id));
     const ratio = list.length ? list.reduce((sum, c) => sum + scoreOf(c.status), 0) / list.length : 1;
-    return { label, max, score: Math.round(ratio * max * 10) / 10 };
+    return { label, max, score: Math.round(Math.pow(ratio, 1.35) * max * 10) / 10 };
   });
-  const arsScore = Math.round(arsCategories.reduce((s, c) => s + c.score, 0) * 10) / 10;
+  // 경고 1개당 -4.5, 실패 1개당 -10 상한을 함께 적용 — 카테고리 평균만으로는
+  // 점수가 후해지는 것을 막는다 (레퍼런스 도구: 경고 6개 ≈ 74점 수준)
+  const catSum = Math.round(arsCategories.reduce((s, c) => s + c.score, 0) * 10) / 10;
+  const cap = Math.round((100 - warnCount * 4.5 - failCount * 10) * 10) / 10;
+  const arsScore = Math.max(5, Math.min(catSum, cap));
   const ars = {
     score: arsScore,
     max: 100,
@@ -484,8 +489,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     console.error("audit save failed", e);
   }
 
-  // ---------- 방문자용 요약 — 전체 리포트는 상담(Contact) 유도용으로 잠근다
-  const issues = checks.filter((c) => c.status !== "pass");
+  // ---------- 방문자용 요약 — 상세 내용(항목명·키워드·개선방안)은 응답에서 아예 제외한다.
+  // 전체 리포트는 DB에만 저장돼 어드민 상담 자료로 쓰인다 (블러 처리는 네트워크 탭에서
+  // 원본이 보이므로, 서버가 요약만 내려보내는 것이 유일하게 안전한 잠금이다).
+  const issueCount = warnCount + failCount;
+  const aiApplicable = aiBriefing.filter((f) => f.status !== "na");
   return ok(res, {
     auditId,
     url: parsed.data.url,
@@ -497,12 +505,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     categories,
     timeMs,
     sizeKb,
-    topKeywords: words.slice(0, 5),
-    keywordTotal: words.length,
-    teaserIssues: issues.slice(0, 2).map((c) => ({ label: c.label, status: c.status, value: c.value })),
-    lockedIssueCount: Math.max(0, issues.length - 2),
     totalChecks: checks.length,
-    ars,
-    aiBriefing,
+    ars: { score: ars.score, max: ars.max, potential: ars.potential },
+    issueCount,
+    keywordCount: words.length,
+    topKeyword: words[0]?.word ?? null,
+    aiPass: aiApplicable.filter((f) => f.status === "pass").length,
+    aiTotal: aiApplicable.length,
   });
 }

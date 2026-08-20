@@ -2,9 +2,15 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import Reveal from "../components/Reveal";
 import { solutionTools } from "../data/solutions";
+import { useSeo } from "../lib/seo";
 
 /** 슬라이드 39~43 — 솔루션: 툴 탭 + 추천 대상 → 작동 원리 → 이점 플로우 */
 export default function Solution() {
+  useSeo({
+    title: "솔루션",
+    description:
+      "부정클릭 차단, 순위 추적, 데이터 분석 등 노블컴퍼니가 운용하는 디지털 마케팅 솔루션. 새는 광고 예산을 막고 성과를 데이터로 관리합니다.",
+  });
   const [activeId, setActiveId] = useState(solutionTools[0].id);
   const active = solutionTools.find((t) => t.id === activeId)!;
 

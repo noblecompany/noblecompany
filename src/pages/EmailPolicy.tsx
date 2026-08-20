@@ -1,7 +1,12 @@
 import Reveal from "../components/Reveal";
+import { useSeo } from "../lib/seo";
 
 /** 이메일무단수집거부 (F12) — 정보통신망법 제50조의2 근거 고지 */
 export default function EmailPolicy() {
+  useSeo({
+    title: "이메일무단수집거부",
+    description: "노블컴퍼니 웹사이트의 이메일 주소 무단 수집 거부 고지입니다.",
+  });
   return (
     <main>
       <section className="page-hero" style={{ paddingBottom: 30 }}>

@@ -12,9 +12,15 @@ import {
   type JobGroup,
 } from "../data/careers";
 import { useJobs } from "../lib/content";
+import { useSeo } from "../lib/seo";
 
 /** CAREERS — 채용공고 목록. 직군 필터 + 전형 절차 + 복리후생 */
 export default function Careers() {
+  useSeo({
+    title: "채용",
+    description:
+      "노블컴퍼니 채용 — 광고기획(AE)·퍼포먼스 마케터·콘텐츠 디자이너·바이럴 등 진행 중인 공고를 확인하고 온라인으로 바로 지원하세요.",
+  });
   const [filter, setFilter] = useState<"ALL" | JobGroup>("ALL");
   const { jobs } = useJobs();
 

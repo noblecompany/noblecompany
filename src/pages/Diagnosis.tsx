@@ -2,15 +2,12 @@ import { useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import { ActionButton } from "seed-design/ui/action-button";
 import Reveal from "../components/Reveal";
+import { useSeo } from "../lib/seo";
 
-interface TopKeyword {
-  word: string;
-  count: number;
-  rate: number;
-  inTitle: boolean;
-  inDesc: boolean;
-}
-
+/**
+ * 방문자에게는 요약(등급·카운트·NRS 총점)만 내려온다 — 항목명·키워드·개선방안 등
+ * 상세 내용은 서버가 아예 보내지 않고 DB에만 저장된다 (상담 유도 리드 퍼널).
+ */
 interface AuditSummary {
   auditId: string | null;
   url: string;
@@ -22,18 +19,13 @@ interface AuditSummary {
   categories: Record<"collect" | "index" | "aeo" | "geo", "pass" | "warn" | "fail">;
   timeMs: number;
   sizeKb: number;
-  topKeywords: TopKeyword[];
-  keywordTotal: number;
-  teaserIssues: Array<{ label: string; status: string; value: string }>;
-  lockedIssueCount: number;
   totalChecks: number;
-  ars: {
-    score: number;
-    max: number;
-    potential: number;
-    categories: Array<{ label: string; max: number; score: number }>;
-  };
-  aiBriefing: Array<{ key: string; label: string; status: "pass" | "missing" | "na" }>;
+  ars: { score: number; max: number; potential: number };
+  issueCount: number;
+  keywordCount: number;
+  topKeyword: string | null;
+  aiPass: number;
+  aiTotal: number;
 }
 
 const CATEGORY_LABEL: Record<string, string> = {
@@ -52,11 +44,22 @@ const GRADE_COMMENT: Record<string, string> = {
   F: "시급한 개선이 필요합니다.",
 };
 
-/**
- * 무료 사이트 진단 (AEO·GEO) — URL 을 넣으면 서버가 분석해 요약을 보여준다.
- * 전체 리포트는 잠그고 상담(Contact) 신청으로 유도하는 리드 퍼널.
- */
+/** 잠금 미리보기용 더미 행 — 실제 데이터가 아니라 시각 효과용 (서버는 상세를 보내지 않는다) */
+const LOCKED_ROWS = [
+  "◼◼◼◼◼◼ 요소 텍스트 길이 확인 — ◼◼자 (개선 방안: ◼◼◼◼◼◼◼◼◼◼◼◼)",
+  "◼◼◼◼ 리소스 ◼◼개 존재 — ◼◼◼◼◼ 적용 필요 (JS ◼◼ / CSS ◼◼)",
+  "핵심 키워드 '◼◼◼◼' 외 ◼◼개 — 타이틀 반영 ◼개 / 메타 반영 ◼개",
+  "구조화 데이터 ◼◼◼◼◼ 누락 — ◼◼◼◼ 스키마 추가 권장",
+  "◼◼◼◼◼◼ 스키마 필드 ◼/5 — name·description·◼◼◼◼◼◼◼◼",
+];
+
+/** 무료 사이트 진단 (AEO·GEO) — URL 입력 → 요약 결과 → 상담 신청 퍼널 */
 export default function Diagnosis() {
+  useSeo({
+    title: "무료 사이트 진단 (AEO·GEO)",
+    description:
+      "URL 만 입력하면 33개 항목을 즉시 점검 — 검색엔진 최적화(AEO)·AI 검색 최적화(GEO)·키워드 분석과 광고연관 준비도 점수를 무료로 확인하세요.",
+  });
   const [url, setUrl] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -109,8 +112,8 @@ export default function Diagnosis() {
               내 사이트, 검색과 AI에 잘 노출되고 있을까요? <span className="accent">무료 진단</span>
             </p>
             <p className="section-desc" style={{ marginTop: 14 }}>
-              주소만 입력하면 수집·색인·AEO(검색엔진 최적화)·GEO(AI 검색 최적화) {`·`} 키워드까지
-              {" "}30여 개 항목을 즉시 점검해 등급을 알려드립니다.
+              주소만 입력하면 수집·색인·AEO(검색엔진 최적화)·GEO(AI 검색 최적화)·키워드까지
+              {" "}33개 항목을 즉시 점검해 등급을 알려드립니다.
             </p>
           </Reveal>
 
@@ -142,7 +145,7 @@ export default function Diagnosis() {
             </form>
             {busy && (
               <p className="diag-progress">
-                사이트에 접속해 30여 개 항목을 점검하고 있습니다… (최대 30초)
+                사이트에 접속해 33개 항목을 점검하고 있습니다… (최대 30초)
               </p>
             )}
             {error && <p className="diag-error">{error}</p>}
@@ -154,7 +157,7 @@ export default function Diagnosis() {
         <section className="section section--soft" id="diag-result">
           <div className="container">
             <Reveal>
-              <p className="eyebrow">진단 결과</p>
+              <p className="eyebrow">진단 결과 요약</p>
               <h2 className="section-title" style={{ wordBreak: "break-all" }}>{result.url}</h2>
               {result.pageTitle && <p className="section-desc">{result.pageTitle}</p>}
             </Reveal>
@@ -197,120 +200,62 @@ export default function Diagnosis() {
                   <div className="diag-ars__score">
                     <strong>{result.ars.score}</strong>
                     <span>/ {result.ars.max}점</span>
-                    {result.warnCount + result.failCount > 0 && (
+                    {result.issueCount > 0 && (
                       <em>
-                        개선 항목 {result.warnCount + result.failCount}개 해결 시{" "}
+                        개선 항목 {result.issueCount}개 해결 시{" "}
                         <b>{result.ars.potential}점</b> 도달 가능
                       </em>
                     )}
                   </div>
-                  <div className="diag-ars__cats">
-                    {result.ars.categories.map((c) => (
-                      <div className="diag-ars__row" key={c.label}>
-                        <span>{c.label}</span>
-                        <div className="diag-ars__bar">
-                          <i style={{ width: `${(c.score / c.max) * 100}%` }} />
-                        </div>
-                        <b>
-                          {c.score} / {c.max}
-                        </b>
-                      </div>
+                  <p className="diag-ars__note">
+                    수집·색인·콘텐츠 연관성·성능·구조화 5개 영역을 종합한 노블컴퍼니 자체
+                    지표입니다. 영역별 점수와 감점 원인은 전체 리포트에서 확인할 수 있습니다.
+                  </p>
+                </div>
+              </div>
+            </Reveal>
+
+            <Reveal>
+              <div className="diag-panel">
+                <h3>상세 진단 내용</h3>
+                <p className="diag-summaryline">
+                  개선 필요 항목 <b>{result.issueCount}개</b> · 핵심 키워드{" "}
+                  <b>{result.keywordCount}개</b> 분석
+                  {result.topKeyword && (
+                    <>
+                      {" "}
+                      (1위: <b>{result.topKeyword}</b>)
+                    </>
+                  )}
+                  {result.aiTotal > 0 && (
+                    <>
+                      {" "}
+                      · AI 브리핑 준비도 <b>{result.aiPass}/{result.aiTotal}</b>
+                    </>
+                  )}
+                </p>
+
+                <div className="diag-lockbox" aria-hidden="true">
+                  <ul>
+                    {LOCKED_ROWS.map((row) => (
+                      <li key={row}>{row}</li>
                     ))}
+                  </ul>
+                  <div className="diag-lockbox__overlay">
+                    <b>🔒 상세 리포트 잠김</b>
+                    <p>
+                      항목별 진단 결과·키워드 분석·개선 방안은
+                      <br />
+                      무료 상담 신청 시 담당 AE가 리포트로 제공해 드립니다.
+                    </p>
                   </div>
                 </div>
-                <p className="diag-dim" style={{ fontSize: 12.5, marginTop: 12 }}>
-                  * NRS(Noble Readiness Score)는 노블컴퍼니가 산출하는 랜딩페이지 준비도
-                  지표로, 네이버 광고연관지수와 상관성은 있으나 동일하지 않습니다.
-                </p>
-              </div>
-            </Reveal>
-
-            <Reveal>
-              <div className="diag-panel">
-                <h3>AI 브리핑 정보 준비도</h3>
-                <p className="diag-dim" style={{ marginBottom: 14 }}>
-                  AI 검색(네이버 AI 브리핑·ChatGPT 등)이 페이지를 이해하는 데 필요한 구조화
-                  정보 5가지를 점검합니다.
-                </p>
-                <div className="diag-ai">
-                  {result.aiBriefing.map((f) => (
-                    <div className={`diag-ai__chip diag-ai__chip--${f.status}`} key={f.key}>
-                      <b>{f.status === "pass" ? "통과" : f.status === "na" ? "해당 없음" : "누락"}</b>
-                      <span>{f.label}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </Reveal>
-
-            <Reveal>
-              <div className="diag-panel">
-                <h3>키워드 요약 (상위 {result.topKeywords.length}개 공개)</h3>
-                <table className="diag-table">
-                  <thead>
-                    <tr>
-                      <th>#</th>
-                      <th>키워드</th>
-                      <th className="diag-right">빈도수</th>
-                      <th className="diag-right">페이지 빈도율</th>
-                      <th>타이틀 태그</th>
-                      <th>메타 디스크립션</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {result.topKeywords.map((k, i) => (
-                      <tr key={k.word}>
-                        <td className="diag-dim">{i + 1}</td>
-                        <td>
-                          <b>{k.word}</b>
-                        </td>
-                        <td className="diag-right">{k.count}</td>
-                        <td className="diag-right">{k.rate}%</td>
-                        <td>{k.inTitle ? "✅" : "❌"}</td>
-                        <td>{k.inDesc ? "✅" : "❌"}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-                {result.keywordTotal > result.topKeywords.length && (
-                  <p className="diag-locked">
-                    🔒 나머지 {result.keywordTotal - result.topKeywords.length}개 키워드와 2어절
-                    프레이즈 분석은 상담 시 전체 리포트로 제공됩니다.
-                  </p>
-                )}
-              </div>
-            </Reveal>
-
-            <Reveal>
-              <div className="diag-panel">
-                <h3>개선이 필요한 항목</h3>
-                {result.teaserIssues.length === 0 ? (
-                  <p className="diag-dim">발견된 개선 항목이 없습니다. 훌륭합니다! 🎉</p>
-                ) : (
-                  <ul className="diag-issues">
-                    {result.teaserIssues.map((iss) => (
-                      <li key={iss.label} className={`diag-issue diag-issue--${iss.status}`}>
-                        <b>{iss.status === "fail" ? "실패" : "경고"}</b>
-                        <span>{iss.label}</span>
-                        <em>{iss.value}</em>
-                      </li>
-                    ))}
-                    {result.lockedIssueCount > 0 && (
-                      <li className="diag-issue diag-issue--locked">
-                        🔒 그 외 {result.lockedIssueCount}개 항목의 상세 진단과 항목별 개선 방안은
-                        전체 리포트에서 확인할 수 있습니다.
-                      </li>
-                    )}
-                  </ul>
-                )}
               </div>
             </Reveal>
 
             <Reveal>
               <div className="diag-cta">
-                <h3>
-                  전체 진단 리포트와 개선 방안이 궁금하신가요?
-                </h3>
+                <h3>전체 진단 리포트와 개선 방안이 궁금하신가요?</h3>
                 <p>
                   노블컴퍼니 AE가 {result.totalChecks}개 항목 상세 리포트를 바탕으로{" "}
                   <b>무료 상담</b>을 도와드립니다. 항목별 개선 방법과 광고·검색 노출 전략까지

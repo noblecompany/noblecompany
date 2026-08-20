@@ -6,6 +6,36 @@
     <!-- 배포 추적 마커 — 어느 커밋이 서빙 중인지 밖에서 확인하는 용도 -->
     <meta name="x-build" content="auth-v1" />
     <meta name="description" content="노블컴퍼니 — 작은 날갯짓이 만드는 큰 변화, 나비효과를 경험하세요. IMC · SA · DA · VIRAL 통합 광고 대행" />
+    <!-- SEO·AEO 기본 메타 — 라우트별 값은 src/lib/seo.ts 훅이 런타임에 교체한다 -->
+    <meta property="og:site_name" content="노블컴퍼니" />
+    <meta property="og:title" content="노블컴퍼니 | NOBLE COMPANY" />
+    <meta property="og:description" content="네이버 프리미어 파트너사 · 카카오 공식대행사. IMC·SA·DA·VIRAL 통합 광고 대행과 퍼포먼스 마케팅 전문 기업." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://e-noble.kr/" />
+    <meta property="og:image" content="https://e-noble.kr/og-image.png" />
+    <meta property="og:locale" content="ko_KR" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <!-- GEO: AI 검색엔진용 회사 구조화 데이터 (Organization) -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "주식회사 노블컴퍼니",
+        "alternateName": "NOBLE COMPANY",
+        "url": "https://e-noble.kr",
+        "logo": "https://e-noble.kr/apple-touch-icon.png",
+        "description": "네이버 프리미어 파트너사 · 카카오 공식대행사. IMC·SA·DA·VIRAL 통합 광고 대행과 퍼포먼스 마케팅 전문 기업.",
+        "address": {
+          "@type": "PostalAddress",
+          "addressCountry": "KR",
+          "addressLocality": "서울특별시 강동구",
+          "streetAddress": "성내로 48 (성내동, 씨네월드) 6층"
+        },
+        "telephone": "+82-2-474-1941",
+        "email": "noble@e-noble.kr",
+        "foundingDate": "2011"
+      }
+    </script>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <!-- 홈 화면 추가(iOS) 아이콘 — 어드민 PWA 매니페스트는 AdminApp 이 /admin 진입 시 주입한다 -->
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />

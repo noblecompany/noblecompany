@@ -4,6 +4,7 @@ import { ActionButton } from "seed-design/ui/action-button";
 import { TextField, TextFieldInput } from "seed-design/ui/text-field";
 import BrochureCta from "../components/BrochureCta";
 import Reveal from "../components/Reveal";
+import { useSeo } from "../lib/seo";
 
 /** 슬라이드 15·45~46 — 선택형 UI 중심의 문의 폼 */
 const INQUIRY_TYPES = [
@@ -45,6 +46,11 @@ const INITIAL: FormState = {
 };
 
 export default function Contact() {
+  useSeo({
+    title: "프로젝트 문의",
+    description:
+      "노블컴퍼니에 광고·마케팅 프로젝트를 문의하세요. 문의 유형만 선택하면 담당 AE가 브랜드 상황에 맞는 방향을 무료로 제안합니다. 02-474-1941",
+  });
   // 무료 진단(/diagnosis)에서 넘어오면 진단 URL·리포트 ID 를 문의 내용에 미리 채운다
   const [params] = useSearchParams();
   const [form, setForm] = useState<FormState>(() => {
