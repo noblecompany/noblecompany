@@ -2757,7 +2757,10 @@ img {
     display: none;
   }
 
-  .qmenu__item {
+  /* is-open 상태의 궤도 transform(.qmenu.is-open .qmenu__item)보다 우선하도록
+     동일 이상 특이도의 선택자로 정적 배치를 강제한다 */
+  .qmenu .qmenu__item,
+  .qmenu.is-open .qmenu__item {
     position: static;
     opacity: 1;
     pointer-events: auto;
