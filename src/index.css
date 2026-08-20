@@ -503,13 +503,13 @@ img {
   bottom: 0;
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  padding: 11px 18px;
+  gap: 9px;
+  padding: 15px 27px;
   border-radius: 999px;
   border: 1px solid var(--line);
   background: var(--surface);
   color: var(--text);
-  font-size: 14px;
+  font-size: 16.5px;
   font-weight: 800;
   white-space: nowrap;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.28);
@@ -520,17 +520,22 @@ img {
   transition: transform 0.45s cubic-bezier(0.22, 1.1, 0.32, 1.15), opacity 0.3s ease;
 }
 
+.qmenu__item svg {
+  width: 19px;
+  height: 19px;
+}
+
 .qmenu__item--diag {
   --qx: -14px;
-  --qy: -80px;
+  --qy: -88px;
   background: var(--noble-blue);
   border-color: var(--noble-blue);
   color: var(--on-accent);
 }
 
 .qmenu__item--contact {
-  --qx: -86px;
-  --qy: -16px;
+  --qx: -90px;
+  --qy: -18px;
   transition-delay: 0.05s;
 }
 
@@ -2758,8 +2763,8 @@ img {
     pointer-events: auto;
     transform: none;
     transition: none;
-    padding: 11px 16px;
-    font-size: 13.5px;
+    padding: 13px 20px;
+    font-size: 15px;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
   }
 
