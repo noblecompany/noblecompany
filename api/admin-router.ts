@@ -412,7 +412,7 @@ async function jobs({ req, res, db, user }: Ctx, id?: string) {
 const WorkBody = z.object({
   id: z.string().trim().regex(/^[a-z0-9-]+$/).min(2).max(80),
   client: z.string().trim().min(1).max(80),
-  category: z.enum(["IMC", "SA", "DA", "VIRAL"]),
+  category: z.enum(["IMC", "SA", "DA", "VIRAL", "관공서"]),
   industry: z.string().max(40).nullable().optional(),
   team: z.string().max(40).nullable().optional(),
   mediaType: z.string().max(120).nullable().optional(),

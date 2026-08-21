@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { adminApi, adminUpload, imageExt, resizeImage, type AdminWork } from "../api";
 import { IconX } from "../../components/Icons";
 
-const CATEGORIES: AdminWork["category"][] = ["IMC", "SA", "DA", "VIRAL"];
+const CATEGORIES: AdminWork["category"][] = ["IMC", "SA", "DA", "VIRAL", "관공서"];
 
 const EMPTY: AdminWork = {
   id: "",

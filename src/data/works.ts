@@ -1,7 +1,7 @@
 // 이 파일은 "포트폴리오 취합 파일 모음"에서 자동 생성되었습니다. 직접 수정하지 마세요.
 // 원본: 포트폴리오_최종 취합_순위.xlsx + 팀별 최종 xlsx/txt
 
-export type WorkCategory = "IMC" | "SA" | "DA" | "VIRAL";
+export type WorkCategory = "IMC" | "SA" | "DA" | "VIRAL" | "관공서";
 
 export interface WorkItem {
   id: string;
@@ -655,5 +655,10 @@ export const workCategories: Array<{
     key: "VIRAL",
     label: "VIRAL",
     desc: "커뮤니티·SNS·인플루언서 채널에서 자연스러운 화제를 만드는 바이럴 마케팅. 실사용 경험 중심의 콘텐츠로 신뢰와 확산을 동시에 얻습니다.",
+  },
+  {
+    key: "관공서",
+    label: "관공서",
+    desc: "중앙부처·지자체·공공기관의 정책 홍보와 대국민 캠페인. 공공성과 정확성을 지키면서 검색·디스플레이·콘텐츠를 결합해 정책 메시지의 도달과 참여를 높입니다.",
   },
 ];

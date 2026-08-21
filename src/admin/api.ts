@@ -183,7 +183,7 @@ export interface AdminJob {
 export interface AdminWork {
   id: string;
   client: string;
-  category: "IMC" | "SA" | "DA" | "VIRAL";
+  category: "IMC" | "SA" | "DA" | "VIRAL" | "관공서";
   industry: string | null;
   team: string | null;
   mediaType: string | null;
