@@ -19,8 +19,10 @@ const HERO_MEDIA = {
   // 유튜브 임베드는 제목·로고 오버레이가 얹혀서, 브랜드필름 원본 mp4를 직접 재생한다.
   // 되돌리려면 youtubeId에 "IeITxaCVsD8" 를 넣으면 유튜브가 우선한다.
   youtubeId: "",
-  // 원본: noble_hero.mp4 (2026-08-24 교체) — 이전 VEIL 브랜드필름은 git 이력에 보관
+  // 원본: NB_노블컴퍼니_홈페이지 영상_V04.mp4 (26.8MB) 를 재인코딩 (2026-08-24)
+  //  - webm(VP9, 2.6MB) 우선 + mp4(H.264, 3.2MB) 폴백. 오디오 제거·faststart
   video: "/noble-hero.mp4",
+  videoWebm: "/noble-hero.webm",
   // 원본: https://e-noble.kr/superboard/data/siteconfig/20260323141812_69c0cd1426e0f_....png
   // (흰 배경 제거 + 다크 배경용 흰색 텍스트 변환본, public/에 로컬 보관)
   logo: "/logo-noble-white.webp",
@@ -128,13 +130,16 @@ export default function Home() {
           HERO_MEDIA.video && (
             <video
               className="hero__video"
-              src={asset(HERO_MEDIA.video)}
               autoPlay
               muted
               loop
               playsInline
               aria-hidden="true"
-            />
+            >
+              {/* VP9(webm)이 더 작고 선명 — 미지원 브라우저(구형 iOS 등)는 mp4 로 폴백 */}
+              <source src={asset(HERO_MEDIA.videoWebm)} type="video/webm" />
+              <source src={asset(HERO_MEDIA.video)} type="video/mp4" />
+            </video>
           )
         )}
         {(HERO_MEDIA.youtubeId || HERO_MEDIA.video) && (
