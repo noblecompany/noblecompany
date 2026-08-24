@@ -13,6 +13,10 @@ function readTheme(): Theme {
 
 export function applyTheme(theme: Theme) {
   document.documentElement.dataset.theme = theme;
+  // seed-design 컴포넌트(TextField 등)도 사이트 테마를 따르게 강제한다.
+  // 기본 부트 스크립트는 'system'(OS 설정)으로 두기 때문에, OS 다크 + 사이트
+  // 라이트 조합에서 폼 라벨이 흰색으로 렌더되던 문제를 막는다.
+  document.documentElement.dataset.seedColorMode = theme === "dark" ? "dark-only" : "light-only";
 }
 
 export function useTheme() {

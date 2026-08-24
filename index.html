@@ -57,6 +57,8 @@
           t = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
         }
         document.documentElement.dataset.theme = t;
+        // seed-design 도 사이트 테마를 따르게 고정 (부트 스크립트의 'system' 덮어쓰기)
+        document.documentElement.dataset.seedColorMode = t === "dark" ? "dark-only" : "light-only";
       })();
     </script>
   </head>
