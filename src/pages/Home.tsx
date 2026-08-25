@@ -97,6 +97,7 @@ const PROCESS = [
 export default function Home() {
   const [lineIndex, setLineIndex] = useState(0);
   const [logoMoment, setLogoMoment] = useState(false);
+  const logoMomentRef = useRef(false); // 인터벌 클로저에서 최신 값을 읽기 위한 ref
   const videoRef = useRef<HTMLVideoElement>(null);
 
   // timeupdate 는 초당 수 회 — 상태가 실제로 바뀔 때만 set 해 리렌더를 아낀다
@@ -104,6 +105,7 @@ export default function Home() {
     const v = videoRef.current;
     if (!v) return;
     const inMoment = v.currentTime >= HERO_LOGO_AT;
+    logoMomentRef.current = inMoment;
     setLogoMoment((prev) => (prev === inMoment ? prev : inMoment));
   };
 
@@ -123,7 +125,12 @@ export default function Home() {
   });
 
   useEffect(() => {
-    const t = setInterval(() => setLineIndex((i) => (i + 1) % HERO_LINES.length), 2600);
+    const t = setInterval(() => {
+      // 로고 모먼트 중엔 카피를 바꾸지 않는다 — 교체 시 새로 마운트되는 h1 의
+      // 등장 애니메이션이 숨김(opacity:0)을 덮어 잠깐 보이는 깜빡임 방지
+      if (logoMomentRef.current) return;
+      setLineIndex((i) => (i + 1) % HERO_LINES.length);
+    }, 2600);
     return () => clearInterval(t);
   }, []);
 
@@ -165,7 +172,12 @@ export default function Home() {
           <div className="hero__veil" aria-hidden="true" />
         )}
         <div className="container hero__inner">
-          <h1 className="hero__line" key={lineIndex} style={{ animation: "hero-swap 0.6s ease" }}>
+          <h1
+            className="hero__line"
+            key={lineIndex}
+            /* 로고 모먼트에는 등장 애니메이션을 붙이지 않는다 (클래스의 숨김이 우선) */
+            style={logoMoment ? undefined : { animation: "hero-swap 0.6s ease" }}
+          >
             {HERO_LINES[lineIndex]}
           </h1>
           <p className="hero__tagline">
