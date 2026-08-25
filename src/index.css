@@ -2742,11 +2742,13 @@ img {
     width: auto;
     flex-direction: row;
     gap: 8px;
-    padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
-    background: color-mix(in srgb, var(--bg) 88%, transparent);
-    -webkit-backdrop-filter: blur(14px);
-    backdrop-filter: blur(14px);
-    border-top: 1px solid var(--line);
+    padding: 10px 12px calc(12px + env(safe-area-inset-bottom));
+    /* 바 배경·보더 없이 버튼만 떠 있는 형태 — 클릭은 버튼에만 통과 */
+    pointer-events: none;
+  }
+
+  .qdock__item {
+    pointer-events: auto;
   }
 
   .qdock__item {
@@ -2758,7 +2760,7 @@ img {
     font-size: 12.5px;
     letter-spacing: -0.01em;
     border-radius: 12px;
-    box-shadow: none;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.32);
   }
 
   /* 라벨이 가장 긴 디자인 포트폴리오에 폭을 조금 더 배분한다 */
