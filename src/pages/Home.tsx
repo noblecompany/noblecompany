@@ -17,6 +17,8 @@ const HERO_LINES = ["HI! WE ARE NOBLE", "WE CAN SHOW YOU", "HOW WE WORK"];
  * 루프가 처음으로 돌아오면 다시 등장시킨다. (페이드 0.7초를 감안해 살짝 앞서 시작)
  */
 const HERO_LOGO_AT = 13.3;
+/** 로고 모먼트 때 CTA 중심을 화면(=로고) 세로 중앙에서 얼마나 아래에 둘지 — 로고 바로 아래 */
+const HERO_CTA_BELOW_LOGO = 130;
 
 /**
  * 히어로 미디어 — youtubeId가 있으면 유튜브 배경, 없으면 video(mp4)로 폴백합니다.
@@ -99,12 +101,26 @@ export default function Home() {
   const [logoMoment, setLogoMoment] = useState(false);
   const logoMomentRef = useRef(false); // 인터벌 클로저에서 최신 값을 읽기 위한 ref
   const videoRef = useRef<HTMLVideoElement>(null);
+  const heroRef = useRef<HTMLElement>(null);
+  const ctaRef = useRef<HTMLDivElement>(null);
 
   // timeupdate 는 초당 수 회 — 상태가 실제로 바뀔 때만 set 해 리렌더를 아낀다
   const onTimeUpdate = () => {
     const v = videoRef.current;
     if (!v) return;
     const inMoment = v.currentTime >= HERO_LOGO_AT;
+    if (inMoment && !logoMomentRef.current) {
+      // 로고 모먼트 진입 순간 — CTA 를 로고 아래 정중앙으로 옮길 이동량을 실측해
+      // CSS 변수로 넘긴다 (화면 크기·카피 줄수와 무관하게 정확한 위치)
+      const hero = heroRef.current?.getBoundingClientRect();
+      const cta = ctaRef.current?.getBoundingClientRect();
+      if (hero && cta && heroRef.current) {
+        const dx = hero.left + hero.width / 2 - (cta.left + cta.width / 2);
+        const dy = hero.top + hero.height / 2 + HERO_CTA_BELOW_LOGO - (cta.top + cta.height / 2);
+        heroRef.current.style.setProperty("--cta-dx", `${Math.round(dx)}px`);
+        heroRef.current.style.setProperty("--cta-dy", `${Math.round(dy)}px`);
+      }
+    }
     logoMomentRef.current = inMoment;
     setLogoMoment((prev) => (prev === inMoment ? prev : inMoment));
   };
@@ -137,7 +153,7 @@ export default function Home() {
   return (
     <main>
       {/* 1. 브랜드 메인 동적 컨텐츠 — 슬라이드 4~6 (영상 확보 전 모션 카피로 대체) */}
-      <section className={`hero ${logoMoment ? "hero--logo" : ""}`}>
+      <section ref={heroRef} className={`hero ${logoMoment ? "hero--logo" : ""}`}>
         <div className="hero__bg" aria-hidden="true" />
         {HERO_MEDIA.youtubeId ? (
           <div className="hero__yt-wrap" aria-hidden="true">
@@ -190,7 +206,7 @@ export default function Home() {
             목표를 분석하고 데이터를 읽고 전략을 도출해내는 광고회사입니다.
           </p>
           <p className="hero__sub">IMC · SA · DA · VIRAL, 광고의 시작부터 성과까지 함께합니다.</p>
-          <div className="hero__cta">
+          <div className="hero__cta" ref={ctaRef}>
             <Link to="/work" className="btn btn--primary">
               포트폴리오 보기
             </Link>

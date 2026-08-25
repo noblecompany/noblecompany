@@ -3574,6 +3574,22 @@ img {
 .hero:not(.hero--logo) .hero__inner > :nth-child(2) { transition-delay: 0.26s; }
 .hero:not(.hero--logo) .hero__inner > :nth-child(1) { transition-delay: 0.34s; }
 
+/* CTA 는 로고 아래 정중앙으로 미끄러져 들어갔다가(카피가 걷힌 뒤), 복귀 시 제자리로 */
+.hero__cta {
+  transition: transform 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.hero--logo .hero__cta {
+  transform: translate(var(--cta-dx, 0px), var(--cta-dy, 0px));
+  transition-delay: 0.25s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero--logo .hero__cta {
+    transform: none;
+  }
+}
+
 /* 베일·스크롤 힌트도 함께 걷어 로고만 남긴다 */
 .hero__veil,
 .hero__scroll {
