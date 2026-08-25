@@ -71,7 +71,7 @@ export function useSeo(opts: SeoOptions = {}) {
       ? image.startsWith("http")
         ? image
         : origin + image
-      : `${origin}/og-image.png`;
+      : `${origin}/og-image-v2.png`;
 
     document.title = fullTitle;
     upsertMeta("name", "description", desc);

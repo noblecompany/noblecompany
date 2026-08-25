@@ -89,7 +89,7 @@ const template = readFileSync(join(DIST, "index.html"), "utf8");
 function renderPage({ path, title, desc, image, jsonLd, body, ogType }) {
   const fullTitle = title ? `${title} | 노블컴퍼니` : "노블컴퍼니 | NOBLE COMPANY";
   const url = BASE + path;
-  const img = image ? (image.startsWith("http") ? image : BASE + image) : `${BASE}/og-image.png`;
+  const img = image ? (image.startsWith("http") ? image : BASE + image) : `${BASE}/og-image-v2.png`;
 
   let html = template
     .replace(/<title>[\s\S]*?<\/title>/, `<title>${esc(fullTitle)}</title>`)
