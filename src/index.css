@@ -2734,23 +2734,84 @@ img {
     padding: 24px 20px;
   }
 
-  /* 모바일 퀵 도크 — 컴팩트 */
+  /* 모바일 퀵 도크 — 화면 하단 전체 폭 탭바 (버튼 스타일은 데스크톱과 동일) */
   .qdock {
-    right: 14px;
-    bottom: 16px;
-    width: 176px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: auto;
+    flex-direction: row;
     gap: 8px;
+    padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+    border-top: 1px solid var(--line);
   }
 
   .qdock__item {
-    padding: 11px 13px;
-    font-size: 13.5px;
+    flex: 1 1 0;
+    min-width: 0;
+    justify-content: center;
+    gap: 5px;
+    padding: 11px 6px;
+    font-size: 12.5px;
+    letter-spacing: -0.01em;
     border-radius: 12px;
+    box-shadow: none;
+  }
+
+  /* 라벨이 가장 긴 디자인 포트폴리오에 폭을 조금 더 배분한다 */
+  .qdock__item--design {
+    flex-grow: 1.35;
+  }
+
+  .qdock__item:hover {
+    transform: none;
   }
 
   .qdock__ico {
-    width: 26px;
-    height: 26px;
+    width: 22px;
+    height: 22px;
+    border-radius: 7px;
+  }
+
+  .qdock__ico svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  /* 외부링크 화살표는 폭 확보를 위해 모바일에서 생략 */
+  .qdock__ext {
+    display: none;
+  }
+
+  /* 탭바 높이만큼 페이지 하단 여백 — 푸터·팝업이 가려지지 않게 */
+  body {
+    padding-bottom: calc(72px + env(safe-area-inset-bottom));
+  }
+
+  .site-popup {
+    bottom: calc(84px + env(safe-area-inset-bottom));
+  }
+}
+
+/* 초소형 화면(≤380px) — 탭바 세 버튼이 한 줄에 정확히 들어가도록 한 단계 더 조인다 */
+@media (max-width: 380px) {
+  .qdock {
+    gap: 6px;
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+
+  .qdock__item {
+    gap: 4px;
+    padding: 11px 4px;
+    font-size: 12px;
+  }
+
+  .qdock__item--diag {
+    flex-grow: 1.1;
   }
 
   /* 모바일은 카피가 화면 폭을 거의 다 쓰므로 좌측 집중 그라디언트가 안 먹는다.
@@ -3494,8 +3555,9 @@ img {
     transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* 퇴장: 위에서부터 차례로 (h1 → 태그라인 → 서브 → CTA) 위로 떠오르며 사라진다 */
-.hero--logo .hero__inner > * {
+/* 퇴장: 위에서부터 차례로 (h1 → 태그라인 → 서브) 위로 떠오르며 사라진다.
+   CTA 버튼(.hero__cta)은 로고와 겹치지 않는 좌하단이라 그대로 남겨 전환 동선을 유지한다 */
+.hero--logo .hero__inner > :not(.hero__cta) {
   opacity: 0;
   transform: translateY(-22px);
   pointer-events: none;
@@ -3505,10 +3567,8 @@ img {
 .hero--logo .hero__inner > :nth-child(2) { transition-delay: 0.06s; }
 .hero--logo .hero__inner > :nth-child(3) { transition-delay: 0.12s; }
 .hero--logo .hero__inner > :nth-child(4) { transition-delay: 0.18s; }
-.hero--logo .hero__inner > :nth-child(5) { transition-delay: 0.24s; }
 
 /* 등장(루프 복귀): 아래에서부터 역순으로 — 마지막에 헤드라인이 자리를 잡는다 */
-.hero:not(.hero--logo) .hero__inner > :nth-child(5) { transition-delay: 0.05s; }
 .hero:not(.hero--logo) .hero__inner > :nth-child(4) { transition-delay: 0.12s; }
 .hero:not(.hero--logo) .hero__inner > :nth-child(3) { transition-delay: 0.19s; }
 .hero:not(.hero--logo) .hero__inner > :nth-child(2) { transition-delay: 0.26s; }
