@@ -3481,3 +3481,58 @@ img {
     gap: 10px;
   }
 }
+
+/* ============================================================
+   히어로 '로고 모먼트' — 영상 끝(약 13.5s~)에 정중앙 로고가 뜨는 구간.
+   카피를 계단식으로 걷어 무대를 비우고, 베일을 걷어 로고를 선명하게.
+   루프가 돌아오면 역순으로 다시 등장한다.
+   ============================================================ */
+
+.hero__inner > * {
+  transition:
+    opacity 0.55s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* 퇴장: 위에서부터 차례로 (h1 → 태그라인 → 서브 → CTA) 위로 떠오르며 사라진다 */
+.hero--logo .hero__inner > * {
+  opacity: 0;
+  transform: translateY(-22px);
+  pointer-events: none;
+}
+
+.hero--logo .hero__inner > :nth-child(1) { transition-delay: 0s; }
+.hero--logo .hero__inner > :nth-child(2) { transition-delay: 0.06s; }
+.hero--logo .hero__inner > :nth-child(3) { transition-delay: 0.12s; }
+.hero--logo .hero__inner > :nth-child(4) { transition-delay: 0.18s; }
+.hero--logo .hero__inner > :nth-child(5) { transition-delay: 0.24s; }
+
+/* 등장(루프 복귀): 아래에서부터 역순으로 — 마지막에 헤드라인이 자리를 잡는다 */
+.hero:not(.hero--logo) .hero__inner > :nth-child(5) { transition-delay: 0.05s; }
+.hero:not(.hero--logo) .hero__inner > :nth-child(4) { transition-delay: 0.12s; }
+.hero:not(.hero--logo) .hero__inner > :nth-child(3) { transition-delay: 0.19s; }
+.hero:not(.hero--logo) .hero__inner > :nth-child(2) { transition-delay: 0.26s; }
+.hero:not(.hero--logo) .hero__inner > :nth-child(1) { transition-delay: 0.34s; }
+
+/* 베일·스크롤 힌트도 함께 걷어 로고만 남긴다 */
+.hero__veil,
+.hero__scroll {
+  transition: opacity 0.9s ease;
+}
+
+.hero--logo .hero__veil {
+  opacity: 0;
+}
+
+.hero--logo .hero__scroll {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero__inner > * {
+    transition: opacity 0.4s ease;
+  }
+  .hero--logo .hero__inner > * {
+    transform: none;
+  }
+}

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import Accordion from "../components/Accordion";
 import ClientsBand from "../components/ClientsBand";
@@ -10,6 +10,13 @@ import { useSeo } from "../lib/seo";
 
 /** 슬라이드 26~28 인트로 카피 로테이션 */
 const HERO_LINES = ["HI! WE ARE NOBLE", "WE CAN SHOW YOU", "HOW WE WORK"];
+
+/**
+ * 히어로 영상 '로고 모먼트' — 약 13.5초부터 끝(16.3초)까지 검은 배경 정중앙에
+ * 노블 로고가 머문다. 이 구간엔 카피를 계단식으로 걷어 로고에 무대를 비워주고,
+ * 루프가 처음으로 돌아오면 다시 등장시킨다. (페이드 0.7초를 감안해 살짝 앞서 시작)
+ */
+const HERO_LOGO_AT = 13.3;
 
 /**
  * 히어로 미디어 — youtubeId가 있으면 유튜브 배경, 없으면 video(mp4)로 폴백합니다.
@@ -89,6 +96,16 @@ const PROCESS = [
 
 export default function Home() {
   const [lineIndex, setLineIndex] = useState(0);
+  const [logoMoment, setLogoMoment] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  // timeupdate 는 초당 수 회 — 상태가 실제로 바뀔 때만 set 해 리렌더를 아낀다
+  const onTimeUpdate = () => {
+    const v = videoRef.current;
+    if (!v) return;
+    const inMoment = v.currentTime >= HERO_LOGO_AT;
+    setLogoMoment((prev) => (prev === inMoment ? prev : inMoment));
+  };
 
   // SEO·GEO — 메인은 기본 제목 + FAQ 구조화 데이터 (AI 검색 인용 대상)
   useSeo({
@@ -113,7 +130,7 @@ export default function Home() {
   return (
     <main>
       {/* 1. 브랜드 메인 동적 컨텐츠 — 슬라이드 4~6 (영상 확보 전 모션 카피로 대체) */}
-      <section className="hero">
+      <section className={`hero ${logoMoment ? "hero--logo" : ""}`}>
         <div className="hero__bg" aria-hidden="true" />
         {HERO_MEDIA.youtubeId ? (
           <div className="hero__yt-wrap" aria-hidden="true">
@@ -129,12 +146,14 @@ export default function Home() {
         ) : (
           HERO_MEDIA.video && (
             <video
+              ref={videoRef}
               className="hero__video"
               autoPlay
               muted
               loop
               playsInline
               aria-hidden="true"
+              onTimeUpdate={onTimeUpdate}
             >
               {/* VP9(webm)이 더 작고 선명 — 미지원 브라우저(구형 iOS 등)는 mp4 로 폴백 */}
               <source src={asset(HERO_MEDIA.videoWebm)} type="video/webm" />
