@@ -255,6 +255,46 @@ async function inquiries({ req, res, db, user }: Ctx, id?: string, sub?: string)
     return ok(res);
   }
 
+  // 고객에게 바로 이메일 회신 — 문의 상세 패널의 '이메일 회신' 블록.
+  // 회신은 고객 주소로 나가고 Reply-To 를 공용함(noble@)으로 달아 고객의 답장이 팀에 들어온다.
+  // 발송 성공 시: 상태 new → contacted, 내부 메모에 회신 이력 한 줄 추가, 감사 로그.
+  if (req.method === "POST" && id && sub === "reply") {
+    const Body = z.object({
+      subject: z.string().trim().min(1).max(200),
+      body: z.string().trim().min(1).max(8000),
+    });
+    const p = Body.safeParse(req.body);
+    if (!p.success) return badBody(res);
+    const { data: q } = await db.from("inquiries").select("*").eq("id", id).maybeSingle();
+    if (!q) return notFound(res);
+
+    const { sendMail } = await import("./_lib/mail.js");
+    try {
+      await sendMail({
+        to: String(q.email),
+        subject: p.data.subject,
+        text: p.data.body,
+        replyTo: process.env.MAIL_TO,
+        fromName: "노블컴퍼니",
+      });
+    } catch (e) {
+      const msg = (e as Error).message ?? "";
+      const hint = /IP is not allowed/i.test(msg)
+        ? " — 하이웍스가 서버 IP를 차단했습니다. 하이웍스 관리자 → 보안 설정에서 발송 계정의 해외/IP 접속 차단을 해제하세요."
+        : "";
+      return fail(res, "mail_failed", `메일 발송 실패: ${msg}${hint}`, 502);
+    }
+
+    const stamp = new Date().toLocaleString("ko-KR", { timeZone: "Asia/Seoul", hour12: false });
+    const line = `[${stamp} 이메일 회신 · ${user.name}] ${p.data.subject}`;
+    const memo = q.memo ? `${q.memo}\n${line}` : line;
+    const status = q.status === "new" ? "contacted" : q.status;
+    const { error } = await db.from("inquiries").update({ memo, status }).eq("id", id);
+    if (error) throw error;
+    await audit(db, req, user, "update", "inquiries:reply", id);
+    return ok(res, { status, memo });
+  }
+
   return methodNa(res);
 }
 

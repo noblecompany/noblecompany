@@ -176,6 +176,7 @@ export default function Inquiries() {
           onClose={close}
           onSave={(patch) => save(selected.id, patch)}
           onReveal={(full) => update(selected.id, full)}
+          onReplied={(patch) => update(selected.id, patch)}
         />
       )}
     </>
@@ -192,18 +193,63 @@ function DetailPanel({
   onClose: () => void;
   onSave: (patch: Partial<Pick<Inquiry, "status" | "assignee" | "memo">>) => void;
   onReveal: (full: { phone: string; email: string }) => void;
+  /** 이메일 회신 성공 — 서버가 갱신한 상태·메모를 목록에 반영 */
+  onReplied: (patch: Pick<Inquiry, "status" | "memo">) => void;
 }) {
   // 개인정보 기본 마스킹 — 전체 보기 시 서버가 감사 로그(F15)를 남기고 원본을 준다
   const [revealed, setRevealed] = useState(false);
   const [assignee, setAssignee] = useState(q.assignee ?? "");
   const [memo, setMemo] = useState(q.memo ?? "");
 
+  // 이메일 회신 — 서버가 고객 주소로 발송하므로 마스킹 해제 없이도 보낼 수 있다
+  const replyTemplate = (inq: Inquiry) => ({
+    subject: `[노블컴퍼니] ${inq.company} 문의 주신 건 회신드립니다`,
+    body: [
+      `${inq.name} 님, 안녕하세요. 노블컴퍼니입니다.`,
+      "",
+      `${inq.types.join(", ")} 관련하여 문의 주셔서 감사합니다.`,
+      "",
+      "",
+      "",
+      "감사합니다.",
+      "노블컴퍼니 드림",
+      "02-474-1941 · noble@e-noble.kr",
+    ].join("\n"),
+  });
+  const [reply, setReply] = useState(() => replyTemplate(q));
+  const [sending, setSending] = useState(false);
+
   // 다른 행을 선택하면 로컬 편집값을 그 행 기준으로 리셋한다
   useEffect(() => {
     setRevealed(false);
     setAssignee(q.assignee ?? "");
     setMemo(q.memo ?? "");
+    setReply(replyTemplate(q));
   }, [q.id]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // 서버가 회신 이력을 메모에 덧붙이므로 상세의 메모 편집칸도 따라간다
+  useEffect(() => {
+    setMemo(q.memo ?? "");
+  }, [q.memo]);
+
+  const sendReply = () => {
+    if (!reply.subject.trim() || !reply.body.trim()) {
+      alert("제목과 내용을 입력해 주세요.");
+      return;
+    }
+    if (!confirm(`${q.name} 님(${q.email})에게 메일을 보낼까요?`)) return;
+    setSending(true);
+    adminApi<{ status: InquiryStatus; memo: string }>(`/inquiries/${q.id}/reply`, {
+      method: "POST",
+      body: { subject: reply.subject.trim(), body: reply.body },
+    })
+      .then((r) => {
+        onReplied(r);
+        alert("메일을 보냈습니다. 고객의 답장은 noble@e-noble.kr 로 들어옵니다.");
+      })
+      .catch((e: Error) => alert(e.message))
+      .finally(() => setSending(false));
+  };
 
   const reveal = () => {
     adminApi<{ phone: string; email: string }>(`/inquiries/${q.id}/reveal`, { method: "POST" })
@@ -316,6 +362,36 @@ function DetailPanel({
               }}
             />
           </label>
+        </div>
+
+        <div className="adm-drawer__block">
+          <h3>이메일 회신</h3>
+          <p className="adm-dim" style={{ marginTop: -4, marginBottom: 10, fontSize: 12 }}>
+            받는 사람: {q.name} 님 ({q.email}) · 발신 noble@e-noble.kr · 보내면 상태가 '응대중'으로 바뀌고 메모에 이력이 남습니다
+          </p>
+          <label className="adm-field">
+            <span>제목</span>
+            <input
+              value={reply.subject}
+              onChange={(e) => setReply((r) => ({ ...r, subject: e.target.value }))}
+            />
+          </label>
+          <label className="adm-field">
+            <span>내용</span>
+            <textarea
+              rows={10}
+              value={reply.body}
+              onChange={(e) => setReply((r) => ({ ...r, body: e.target.value }))}
+            />
+          </label>
+          <button
+            type="button"
+            className="adm-btn adm-btn--primary"
+            onClick={sendReply}
+            disabled={sending}
+          >
+            {sending ? "보내는 중…" : "메일 보내기"}
+          </button>
         </div>
       </div>
     </div>
