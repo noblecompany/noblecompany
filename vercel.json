@@ -14,7 +14,7 @@
     { "source": "/doc/private", "destination": "/privacy", "permanent": true },
     { "source": "/doc/policy", "destination": "/privacy", "permanent": true },
     { "source": "/doc/antiemail", "destination": "/email-policy", "permanent": true },
-    { "source": "/solution/:path*", "destination": "/solution", "permanent": true },
+    { "source": "/solution/:path+", "destination": "/solution", "permanent": true },
     { "source": "/work/da", "destination": "/work", "permanent": true },
     { "source": "/work/imc", "destination": "/work", "permanent": true },
     { "source": "/work/search", "destination": "/work", "permanent": true },
