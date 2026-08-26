@@ -118,11 +118,32 @@ function Authorized({ onLogout }: { onLogout: () => void }) {
   );
 }
 
+/** 시간대별 인사말 — 5시 전/22시 후 '편안한 밤이에요' */
+function greetingByHour(h: number): string {
+  if (h < 5) return "편안한 밤이에요";
+  if (h < 12) return "좋은 아침이에요";
+  if (h < 18) return "좋은 오후예요";
+  if (h < 22) return "좋은 저녁이에요";
+  return "편안한 밤이에요";
+}
+
+function todayLabel(d: Date): string {
+  const wd = ["일", "월", "화", "수", "목", "금", "토"][d.getDay()];
+  return `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일 ${wd}요일`;
+}
+
+/**
+ * 로그인 화면 — 흰 배경 + 그라데이션 탑바, 글자 단위로 통통 튀는 인사 카드(시간대별),
+ * 오늘 날짜, 펄스 도트. 기능은 그대로 Supabase 이메일/비밀번호 로그인.
+ */
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+
+  const now = new Date();
+  const greeting = greetingByHour(now.getHours());
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
@@ -132,13 +153,17 @@ function Login() {
       setError("인증 설정이 없습니다. VITE_SUPABASE_* 환경변수를 확인해 주세요.");
       return;
     }
-    if (!email || !password) {
-      setError("이메일과 비밀번호를 입력해 주세요.");
+    if (!email.trim()) {
+      setError("이메일을 입력하세요.");
+      return;
+    }
+    if (!password) {
+      setError("비밀번호를 입력하세요.");
       return;
     }
 
     setBusy(true);
-    const { error: err } = await supabase.auth.signInWithPassword({ email, password });
+    const { error: err } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
     setBusy(false);
     if (err) {
       // 계정 없음/비번 오류를 구분해 알려주지 않는다 (계정 존재 여부 노출 방지)
@@ -148,48 +173,85 @@ function Login() {
   };
 
   return (
-    <div className="adm-login">
-      <form className="adm-login__card" onSubmit={submit}>
-        <div className="adm-login__brand">
-          noble<b>.</b>admin
+    <div className="nlg">
+      <div className="nlg__topbar" />
+      <div className="nlg__card">
+        <div className="nlg__logo">
+          <img src="/logo-noble.webp" alt="NOBLE COMPANY" />
         </div>
-        <p className="adm-login__desc">노블컴퍼니 관리자 콘솔</p>
 
-        <label className="adm-field">
-          <span>이메일</span>
+        <div className="nlg__hi">
+          <p>브랜드의 성장을 데이터로 증명합니다,</p>
+          <p className="nlg__hi-b">노블컴퍼니</p>
+        </div>
+
+        <div className="nlg__greet">
+          <div className="nlg__shimmer" />
+          <span className="nlg__spk" style={{ top: "12%", right: "22%", width: 5, height: 5, background: "#2e80e8", boxShadow: "0 0 4px #2e80e8" }} />
+          <span className="nlg__spk" style={{ top: "62%", right: "17%", width: 4, height: 4, background: "#a78bfa", boxShadow: "0 0 4px #a78bfa", animationDelay: ".9s" }} />
+          <span className="nlg__spk" style={{ top: "28%", right: "11%", width: 3, height: 3, background: "#67e8f9", boxShadow: "0 0 4px #67e8f9", animationDelay: "1.8s" }} />
+          <div className="nlg__txt">
+            <p className="nlg__g" aria-label={greeting}>
+              {greeting.split("").map((ch, i) => (
+                <span
+                  key={i}
+                  aria-hidden="true"
+                  style={
+                    ch === " "
+                      ? undefined
+                      : {
+                          animation: `nlgCharJump ${(2 + (i % 5) * 0.2).toFixed(1)}s cubic-bezier(.36,.07,.19,.97) ${((i * 0.37) % 2).toFixed(1)}s infinite`,
+                        }
+                  }
+                >
+                  {ch}
+                </span>
+              ))}
+            </p>
+            <p className="nlg__date">{todayLabel(now)}</p>
+          </div>
+          <div className="nlg__dot">
+            <span className="nlg__ring" />
+            <span className="nlg__ring nlg__ring--d2" />
+            <span className="nlg__core" />
+          </div>
+        </div>
+
+        <div className="nlg__div">
+          <span className="nlg__ln" />
+          <span>Admin Console</span>
+          <span className="nlg__ln" />
+        </div>
+
+        <form onSubmit={submit} autoComplete="off" noValidate>
           <input
             type="email"
+            className="nlg__input"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="name@e-noble.kr"
+            placeholder="이메일"
             autoComplete="username"
+            autoFocus
           />
-        </label>
-        <label className="adm-field">
-          <span>비밀번호</span>
           <input
             type="password"
+            className="nlg__input"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="••••••••"
+            placeholder="비밀번호"
             autoComplete="current-password"
+            style={{ marginTop: 10 }}
           />
-        </label>
+          <button type="submit" className="nlg__submit" disabled={busy}>
+            {busy ? "확인 중…" : "로그인"}
+          </button>
+          <div className="nlg__err" role="alert">
+            {error ?? ""}
+          </div>
+        </form>
 
-        {error && <p className="adm-login__error">{error}</p>}
-
-        <button
-          type="submit"
-          className="adm-btn adm-btn--primary adm-login__submit"
-          disabled={busy}
-        >
-          {busy ? "확인 중…" : "로그인"}
-        </button>
-
-        <p className="adm-login__dev">
-          계정 문의: 관리자(Supabase Authentication → Users 에서 발급)
-        </p>
-      </form>
+        <p className="nlg__copy">© {now.getFullYear()} 노블컴퍼니 · NOBLE COMPANY</p>
+      </div>
     </div>
   );
 }
