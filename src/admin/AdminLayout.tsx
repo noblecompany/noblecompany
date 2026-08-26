@@ -42,6 +42,31 @@ export default function AdminLayout({
   const [menuOpen, setMenuOpen] = useState(false);
   useEffect(() => setMenuOpen(false), [pathname]);
 
+  // 모바일 카드 UI — 모든 .adm-table 의 td 에 헤더 텍스트를 data-label 로 달아
+  // 좁은 화면에서 "라벨: 값" 카드로 접히게 한다 (CSS: @media ≤640px). 페이지마다 손대지 않고 여기서 일괄 처리.
+  const mainRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const root = mainRef.current;
+    if (!root) return;
+    const label = () => {
+      root.querySelectorAll<HTMLTableElement>("table.adm-table").forEach((table) => {
+        const heads = Array.from(table.querySelectorAll("thead th")).map((th) => th.textContent?.trim() ?? "");
+        if (!heads.length) return;
+        table.querySelectorAll("tbody tr").forEach((tr) => {
+          Array.from(tr.children).forEach((td, i) => {
+            if (!(td instanceof HTMLElement) || td.hasAttribute("colspan")) return;
+            const h = heads[i];
+            if (h && td.dataset.label !== h) td.dataset.label = h;
+          });
+        });
+      });
+    };
+    label();
+    const mo = new MutationObserver(label);
+    mo.observe(root, { childList: true, subtree: true });
+    return () => mo.disconnect();
+  }, [pathname]);
+
   return (
     <div className="adm">
       {menuOpen && <div className="adm-side-scrim" onClick={() => setMenuOpen(false)} />}
@@ -71,7 +96,7 @@ export default function AdminLayout({
         </div>
       </aside>
 
-      <div className="adm-main">
+      <div className="adm-main" ref={mainRef}>
         <header className="adm-top">
           <button
             type="button"

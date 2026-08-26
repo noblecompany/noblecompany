@@ -42,6 +42,17 @@ export default function AdminApp() {
     title.name = "apple-mobile-web-app-title";
     title.content = "noble.admin";
     document.head.appendChild(title);
+
+    // 어드민(앱 모드)에서는 핀치/더블탭 줌을 막아 네이티브 앱처럼 — 입력창 포커스 시 자동 줌도 함께 차단
+    // (공개 사이트는 그대로 두고, 어드민 진입 시에만 뷰포트를 바꾼다)
+    const viewport = document.querySelector<HTMLMetaElement>('meta[name="viewport"]');
+    const prevViewport = viewport?.content;
+    if (viewport) {
+      viewport.content = "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover";
+    }
+    return () => {
+      if (viewport && prevViewport) viewport.content = prevViewport;
+    };
   }, []);
 
   useEffect(() => {
