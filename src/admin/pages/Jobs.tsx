@@ -164,7 +164,8 @@ function Editor({
   onClose: () => void;
   onSaved: () => void;
 }) {
-  const [f, setF] = useState<AdminJob>(job);
+  // 서버/구버전 응답에서 applyLinks 가 배열이 아닐 수 있어 방어 (폼은 배열 전제)
+  const [f, setF] = useState<AdminJob>({ ...job, applyLinks: Array.isArray(job.applyLinks) ? job.applyLinks : [] });
   const [always, setAlways] = useState(job.deadline === null); // 상시채용
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);

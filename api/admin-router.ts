@@ -401,7 +401,7 @@ const mapJob = (r: Record<string, unknown>) => ({
   career: r.career, location: r.location, deadline: r.deadline, summary: r.summary,
   responsibilities: r.responsibilities, requirements: r.requirements, preferred: r.preferred,
   status: r.status, sortOrder: r.sort_order, viewCount: r.view_count,
-  applyLinks: r.apply_links ?? {},
+  applyLinks: Array.isArray(r.apply_links) ? r.apply_links : [],
   createdAt: r.created_at, updatedAt: r.updated_at,
 });
 
