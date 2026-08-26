@@ -1910,3 +1910,23 @@
 .adm-imggrid .adm-rowlist__ops {
   padding: 0 8px;
 }
+
+/* 채용공고 — 외부 플랫폼 링크 행 (플랫폼명 | URL | 삭제) */
+.adm-linkrow {
+  display: grid;
+  grid-template-columns: minmax(120px, 1fr) minmax(0, 2.4fr) auto;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.adm-linkrow input {
+  min-width: 0;
+}
+@media (max-width: 640px) {
+  .adm-linkrow {
+    grid-template-columns: 1fr auto;
+  }
+  .adm-linkrow input[type="url"] {
+    grid-column: 1 / -1;
+  }
+}

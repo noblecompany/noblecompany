@@ -3915,3 +3915,52 @@ img {
     align-items: flex-start;
   }
 }
+
+/* 지원접수 모달 — 외부 채용 플랫폼 버튼 (소셜 로그인 스타일, 어드민에서 등록한 만큼 노출) */
+.apply-ext {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 4px 0 6px;
+}
+.apply-ext__btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 48px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 700;
+  text-decoration: none;
+  background: var(--surface-2, rgba(127, 127, 127, 0.12));
+  color: var(--text);
+  border: 1px solid var(--line);
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+.apply-ext__btn:hover {
+  filter: brightness(1.06);
+  transform: translateY(-1px);
+}
+.apply-ext__btn[style] {
+  border-color: transparent;
+}
+.apply-ext__btn svg {
+  flex: none;
+  opacity: 0.85;
+}
+.apply-ext__divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 14px 0 12px;
+  color: var(--text-dim);
+  font-size: 13px;
+}
+.apply-ext__divider::before,
+.apply-ext__divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}

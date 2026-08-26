@@ -20,6 +20,8 @@ const mapJob = (r: Record<string, unknown>) => ({
   responsibilities: r.responsibilities,
   requirements: r.requirements,
   preferred: r.preferred,
+  // 외부 채용 플랫폼 지원 링크 — [{label, url}] (컬럼 미적용/없음이면 빈 배열)
+  applyLinks: Array.isArray(r.apply_links) ? r.apply_links : [],
 });
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {

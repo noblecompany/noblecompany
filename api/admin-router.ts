@@ -378,13 +378,30 @@ const JobBody = z.object({
   preferred: z.array(z.string().max(200)).max(20),
   status: z.enum(["draft", "published", "closed"]),
   sortOrder: z.number().int().optional(),
+  // 외부 채용 플랫폼 지원 링크 (0009) — [{label, url}] 개수 제한 없음(최대 20). 빈 행은 버린다
+  applyLinks: z
+    .array(
+      z.object({
+        label: z.string().trim().max(30),
+        url: z.string().trim().max(500),
+      }),
+    )
+    .max(20)
+    .optional(),
 });
+
+/** 빈 행 제거 + URL 형식 검증 — 플랫폼명·URL 둘 다 있는 행만 저장 */
+const cleanLinks = (l: z.infer<typeof JobBody>["applyLinks"]) =>
+  (l ?? [])
+    .filter((x) => x.label && x.url)
+    .map((x) => ({ label: x.label, url: /^https?:\/\//i.test(x.url) ? x.url : `https://${x.url}` }));
 
 const mapJob = (r: Record<string, unknown>) => ({
   id: r.id, title: r.title, group: r.job_group, team: r.team, employment: r.employment,
   career: r.career, location: r.location, deadline: r.deadline, summary: r.summary,
   responsibilities: r.responsibilities, requirements: r.requirements, preferred: r.preferred,
   status: r.status, sortOrder: r.sort_order, viewCount: r.view_count,
+  applyLinks: r.apply_links ?? {},
   createdAt: r.created_at, updatedAt: r.updated_at,
 });
 
@@ -393,6 +410,8 @@ const jobRow = (b: z.infer<typeof JobBody>) => ({
   career: b.career, location: b.location, deadline: b.deadline, summary: b.summary,
   responsibilities: b.responsibilities, requirements: b.requirements, preferred: b.preferred,
   status: b.status, sort_order: b.sortOrder ?? 0, updated_at: new Date().toISOString(),
+  // 컬럼은 0009 마이그레이션 후 존재 — 값이 올 때만 포함해 미적용 DB에서도 저장이 깨지지 않게
+  ...(b.applyLinks !== undefined ? { apply_links: cleanLinks(b.applyLinks) } : {}),
 });
 
 async function jobs({ req, res, db, user }: Ctx, id?: string) {

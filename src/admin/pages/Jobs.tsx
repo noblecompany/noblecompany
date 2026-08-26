@@ -21,6 +21,7 @@ const EMPTY: AdminJob = {
   status: "draft",
   sortOrder: 0,
   viewCount: 0,
+  applyLinks: [],
   createdAt: "",
   updatedAt: "",
 };
@@ -202,6 +203,10 @@ function Editor({
       preferred: f.preferred,
       status,
       sortOrder: f.sortOrder,
+      // 플랫폼명·URL 둘 다 있는 행만 (빈 행은 서버에서도 버림)
+      applyLinks: (f.applyLinks ?? [])
+        .map((l) => ({ label: l.label.trim(), url: l.url.trim() }))
+        .filter((l) => l.label || l.url),
     };
 
     setBusy(true);
@@ -326,6 +331,52 @@ function Editor({
           <ListField label="주요 업무" value={f.responsibilities} onChange={(v) => set("responsibilities", v)} />
           <ListField label="자격 요건" value={f.requirements} onChange={(v) => set("requirements", v)} />
           <ListField label="우대 사항" value={f.preferred} onChange={(v) => set("preferred", v)} />
+        </div>
+
+        <div className="adm-drawer__block">
+          <h3>
+            외부 채용 플랫폼 지원 링크{" "}
+            <em className="adm-dim">(지원접수 화면에 "○○로 지원하기" 버튼으로 노출 · 원하는 만큼 추가)</em>
+          </h3>
+          {(f.applyLinks ?? []).map((l, i) => (
+            <div key={i} className="adm-linkrow">
+              <input
+                value={l.label}
+                placeholder="플랫폼명 (예: 잡코리아)"
+                maxLength={30}
+                onChange={(e) => {
+                  const next = [...(f.applyLinks ?? [])];
+                  next[i] = { ...next[i], label: e.target.value };
+                  set("applyLinks", next);
+                }}
+              />
+              <input
+                type="url"
+                value={l.url}
+                placeholder="https://www.jobkorea.co.kr/Recruit/GI_Read/…"
+                onChange={(e) => {
+                  const next = [...(f.applyLinks ?? [])];
+                  next[i] = { ...next[i], url: e.target.value };
+                  set("applyLinks", next);
+                }}
+              />
+              <button
+                type="button"
+                className="adm-iconbtn"
+                aria-label="삭제"
+                onClick={() => set("applyLinks", (f.applyLinks ?? []).filter((_, j) => j !== i))}
+              >
+                <IconX size={16} />
+              </button>
+            </div>
+          ))}
+          <button
+            type="button"
+            className="adm-btn"
+            onClick={() => set("applyLinks", [...(f.applyLinks ?? []), { label: "", url: "" }])}
+          >
+            + 플랫폼 추가
+          </button>
         </div>
 
         {err && <p className="adm-pagemsg adm-pagemsg--error">{err}</p>}

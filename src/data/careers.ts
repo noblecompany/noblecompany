@@ -26,6 +26,30 @@ export interface JobPosting {
   responsibilities: string[];
   requirements: string[];
   preferred: string[];
+  /** 외부 채용 플랫폼 공고 링크 — 지원접수 화면에 "○○로 지원하기" 버튼으로 노출 (어드민에서 개수 제한 없이 등록) */
+  applyLinks?: ApplyLink[];
+}
+
+export interface ApplyLink {
+  /** 플랫폼명 — 예) 잡코리아, 사람인, 원티드, 링크드인 */
+  label: string;
+  url: string;
+}
+
+/**
+ * 알려진 플랫폼은 브랜드 색으로 버튼을 칠한다 (플랫폼명에 키워드가 포함되면 매칭).
+ * 모르는 플랫폼은 중립색.
+ */
+export function applyLinkBrand(label: string): { bg: string; fg: string } | null {
+  const l = label.toLowerCase();
+  if (l.includes("사람인") || l.includes("saramin")) return { bg: "#4876ef", fg: "#fff" };
+  if (l.includes("잡코리아") || l.includes("jobkorea")) return { bg: "#2c5fd9", fg: "#fff" };
+  if (l.includes("원티드") || l.includes("wanted")) return { bg: "#3366ff", fg: "#fff" };
+  if (l.includes("링크드인") || l.includes("linkedin")) return { bg: "#0a66c2", fg: "#fff" };
+  if (l.includes("인크루트") || l.includes("incruit")) return { bg: "#1a8ae5", fg: "#fff" };
+  if (l.includes("잡플래닛") || l.includes("jobplanet")) return { bg: "#00c2a8", fg: "#fff" };
+  if (l.includes("리멤버") || l.includes("remember")) return { bg: "#1f2a44", fg: "#fff" };
+  return null;
 }
 
 export const jobGroups: { key: JobGroup; label: string; desc: string }[] = [

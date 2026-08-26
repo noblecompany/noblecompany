@@ -1,7 +1,16 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { ActionButton } from "seed-design/ui/action-button";
 import { TextField, TextFieldInput } from "seed-design/ui/text-field";
-import type { JobPosting } from "../data/careers";
+import { applyLinkBrand, type JobPosting } from "../data/careers";
+
+/** 조사 '로/으로' — 받침 있으면 '으로'(ㄹ 받침 제외), 없거나 한글이 아니면 '로'. 예) 사람인으로 · 잡코리아로 · 원티드로 */
+function josaRo(word: string): string {
+  const ch = word.trim().slice(-1);
+  const code = ch.charCodeAt(0) - 0xac00;
+  if (code < 0 || code > 11171) return "로";
+  const jong = code % 28;
+  return jong === 0 || jong === 8 ? "로" : "으로";
+}
 
 /** 이력서 허용 형식 — 서버(api/uploads-resume)와 동일하게 유지 */
 const RESUME_ACCEPT = ".pdf,.doc,.docx,.hwp,.hwpx";
@@ -171,6 +180,36 @@ export default function ApplyModal({ job, onClose }: { job: JobPosting; onClose:
             </svg>
           </button>
         </header>
+
+        {/* 외부 채용 플랫폼 — 어드민에서 등록한 링크만큼 버튼 노출 (지원자가 익숙한 곳으로 바로 이동) */}
+        {!done && (job.applyLinks?.length ?? 0) > 0 && (
+          <>
+            <div className="apply-ext" aria-label="다른 채용 플랫폼으로 지원">
+              {job.applyLinks!.map((l) => {
+                const brand = applyLinkBrand(l.label);
+                return (
+                  <a
+                    key={l.url}
+                    className="apply-ext__btn"
+                    href={l.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={brand ? { background: brand.bg, color: brand.fg } : undefined}
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <path d="M14 4h6v6" />
+                      <path d="M20 4L10 14" />
+                      <path d="M18 13v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h6" />
+                    </svg>
+                    {l.label}
+                    {josaRo(l.label)} 지원하기
+                  </a>
+                );
+              })}
+            </div>
+            <div className="apply-ext__divider">또는 아래 양식으로 바로 지원</div>
+          </>
+        )}
 
         {done ? (
           <div className="apply-modal__done">

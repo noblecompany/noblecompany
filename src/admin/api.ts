@@ -176,6 +176,8 @@ export interface AdminJob {
   status: "draft" | "published" | "closed";
   sortOrder: number;
   viewCount: number;
+  /** 외부 채용 플랫폼 링크 — 플랫폼명 + URL, 개수 제한 없음 (지원접수 화면 버튼) */
+  applyLinks: { label: string; url: string }[];
   createdAt: string;
   updatedAt: string;
 }
