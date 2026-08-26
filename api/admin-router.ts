@@ -430,7 +430,11 @@ async function jobs({ req, res, db, user }: Ctx, id?: string) {
     const { data: dup } = await db.from("job_postings").select("id").eq("id", p.data.id).maybeSingle();
     if (dup) return fail(res, "duplicate_id", "이미 사용 중인 슬러그입니다.", 409);
     const { data, error } = await db.from("job_postings").insert(jobRow(p.data)).select("*").single();
-    if (error) throw error;
+    if (error) {
+      if (["42703", "PGRST204"].includes((error as { code?: string }).code ?? "") && /apply_links/.test(error.message))
+        return fail(res, "migration_required", "외부 지원 링크 저장에는 Supabase SQL 0009(apply_links 컬럼) 실행이 먼저 필요합니다.", 409);
+      throw error;
+    }
     return ok(res, mapJob(data), 201);
   }
 
@@ -456,7 +460,8 @@ async function jobs({ req, res, db, user }: Ctx, id?: string) {
     const { data, error } = await db.from("job_postings").update(patch).eq("id", id).select("*").maybeSingle();
     if (error) {
       // 0009 마이그레이션 전 — 컬럼 없음(42703)을 사람이 읽을 수 있는 안내로
-      if ((error as { code?: string }).code === "42703" && /apply_links/.test(error.message))
+      // Postgres 직접(42703) 또는 PostgREST 스키마 캐시(PGRST204) 둘 다 '컬럼 없음'
+      if (["42703", "PGRST204"].includes((error as { code?: string }).code ?? "") && /apply_links/.test(error.message))
         return fail(res, "migration_required", "외부 지원 링크 저장에는 Supabase SQL 0009(apply_links 컬럼) 실행이 먼저 필요합니다.", 409);
       throw error;
     }
