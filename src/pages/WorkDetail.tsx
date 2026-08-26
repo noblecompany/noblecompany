@@ -14,7 +14,14 @@ export default function WorkDetail() {
     work
       ? {
           title: `${work.client} ${work.category} 캠페인`,
-          description: `${work.client} ${work.category} 캠페인 사례 — ${work.objective}`.slice(0, 160),
+          // 프리렌더(scripts/postbuild-seo.mjs)와 같은 규칙 — 목표가 짧으면 전략·업종을 이어 붙인다
+          description: [
+            `${work.client} ${work.category} 캠페인 사례`,
+            work.industry ? `(${work.industry})` : "",
+            `— ${work.objective}`,
+            work.strategy ? ` ${work.strategy}` : "",
+            " 노블컴퍼니가 집행한 실제 광고 운영 전략을 확인하세요.",
+          ].join("").replace(/\s+/g, " ").slice(0, 155),
           image: work.hero,
           ogType: "article",
         }

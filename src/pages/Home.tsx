@@ -128,7 +128,7 @@ export default function Home() {
   // SEO·GEO — 메인은 기본 제목 + FAQ 구조화 데이터 (AI 검색 인용 대상)
   useSeo({
     description:
-      "네이버 프리미어 파트너사 노블컴퍼니. IMC·SA·DA·VIRAL 통합 광고 대행, 데이터 기반 퍼포먼스 마케팅으로 800개 이상 브랜드의 성장을 만들었습니다.",
+      "네이버 프리미어 파트너사 노블컴퍼니 — 브랜드 분석과 데이터로 성과를 만드는 퍼포먼스 마케팅 광고대행사. IMC·검색광고(SA)·디스플레이(DA)·바이럴 캠페인 기획부터 운영·성과 관리까지 함께합니다.",
     jsonLd: {
       "@context": "https://schema.org",
       "@type": "FAQPage",

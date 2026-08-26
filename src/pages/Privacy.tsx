@@ -148,7 +148,8 @@ const SECTIONS: { title: string; body: React.ReactNode }[] = [
 export default function Privacy() {
   useSeo({
     title: "개인정보처리방침",
-    description: "주식회사 노블컴퍼니의 개인정보 수집·이용·보관·파기에 관한 처리방침입니다.",
+    description:
+      "주식회사 노블컴퍼니의 개인정보처리방침 — 프로젝트 문의·채용 지원 시 수집하는 개인정보의 항목, 이용 목적, 보관 기간(문의 3년·지원서 1년)과 자동 파기, 열람·정정 요청 방법을 안내합니다.",
   });
   return (
     <main>

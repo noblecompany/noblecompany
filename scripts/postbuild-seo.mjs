@@ -78,10 +78,17 @@ if (!jobs) {
 
 let noticeRows = await fetchRows(
   "notices",
-  "slug,title,body,published_at,pinned,source_name",
+  "slug,title,body,published_at,updated_at,pinned,source_name,images",
   "&status=eq.published&order=pinned.desc,published_at.desc",
 );
 if (!noticeRows) noticeRows = [];
+/** 공지 첫 이미지의 Storage 공개 URL — OG·NewsArticle 이미지로 쓴다 */
+const noticeImageUrl = (n) => {
+  const first = Array.isArray(n.images) ? n.images[0] : null;
+  return first?.path && env.VITE_SUPABASE_URL
+    ? `${env.VITE_SUPABASE_URL}/storage/v1/object/public/notices/${first.path}`
+    : null;
+};
 
 const { FAQ } = await loadTs("src/data/faq.ts");
 const { solutionTools } = await loadTs("src/data/solutions.ts");
@@ -94,7 +101,7 @@ const esc = (s) =>
 const template = readFileSync(join(DIST, "index.html"), "utf8");
 
 function renderPage({ path, title, desc, image, jsonLd, body, ogType }) {
-  const fullTitle = title ? `${title} | 노블컴퍼니` : "노블컴퍼니 | NOBLE COMPANY";
+  const fullTitle = title ? `${title} | 노블컴퍼니` : "노블컴퍼니 | 퍼포먼스 마케팅 광고대행사 · 네이버 프리미어 파트너";
   const url = BASE + path;
   const img = image ? (image.startsWith("http") ? image : BASE + image) : `${BASE}/og-image-v2.png`;
 
@@ -150,7 +157,7 @@ const pages = [];
 pages.push({
   path: "/",
   title: null,
-  desc: "네이버 프리미어 파트너사 노블컴퍼니. IMC·SA·DA·VIRAL 통합 광고 대행, 데이터 기반 퍼포먼스 마케팅으로 800개 이상 브랜드의 성장을 만들었습니다.",
+  desc: "네이버 프리미어 파트너사 노블컴퍼니 — 브랜드 분석과 데이터로 성과를 만드는 퍼포먼스 마케팅 광고대행사. IMC·검색광고(SA)·디스플레이(DA)·바이럴 캠페인 기획부터 운영·성과 관리까지 함께합니다.",
   jsonLd: {
     "@context": "https://schema.org",
     "@type": "FAQPage",
@@ -182,7 +189,14 @@ for (const w of works) {
   pages.push({
     path: `/work/${w.id}`,
     title: `${w.client} ${w.category} 캠페인`,
-    desc: `${w.client} ${w.category} 캠페인 사례 — ${w.objective ?? ""}`.slice(0, 160),
+    // 목표가 짧은 건이 많아 전략·업종을 이어 붙여 검색 결과 요약문 길이(80~155자)를 확보한다
+    desc: [
+      `${w.client} ${w.category} 캠페인 사례`,
+      w.industry ? `(${w.industry})` : "",
+      `— ${w.objective ?? ""}`,
+      w.strategy ? ` ${w.strategy}` : "",
+      " 노블컴퍼니가 집행한 실제 광고 운영 전략을 확인하세요.",
+    ].join("").replace(/\s+/g, " ").slice(0, 155),
     image: w.hero_path,
     ogType: "article",
     body: `<h1>${esc(w.client)} — ${esc(w.category)} 캠페인</h1>
@@ -288,11 +302,28 @@ ${NAV_LINKS}`,
 });
 for (const n of noticeRows) {
   const paras = String(n.body).split(/\n\s*\n/).map((s) => s.trim()).filter(Boolean);
+  const nImg = noticeImageUrl(n);
   pages.push({
     path: `/notice/${n.slug}`,
     title: n.title,
     desc: String(n.body).replace(/\s+/g, " ").slice(0, 150),
     ogType: "article",
+    image: nImg,
+    jsonLd: {
+      "@context": "https://schema.org",
+      "@type": "NewsArticle",
+      headline: n.title,
+      datePublished: n.published_at,
+      dateModified: n.updated_at ?? n.published_at,
+      ...(nImg ? { image: [nImg] } : {}),
+      author: { "@type": "Organization", name: "주식회사 노블컴퍼니" },
+      publisher: {
+        "@type": "Organization",
+        name: "주식회사 노블컴퍼니",
+        logo: { "@type": "ImageObject", url: `${BASE}/apple-touch-icon.png` },
+      },
+      mainEntityOfPage: `${BASE}/notice/${n.slug}`,
+    },
     body: `<h1>${esc(n.title)}</h1><p>${esc(n.published_at.slice(0, 10))}${n.source_name ? ` · ${esc(n.source_name)}` : ""}</p>
 ${paras.map((s) => `<p>${esc(s)}</p>`).join("")}
 <p>${a("/notice", "공지사항 목록")}</p>`,
@@ -311,13 +342,13 @@ pages.push({
 pages.push({
   path: "/privacy",
   title: "개인정보처리방침",
-  desc: "주식회사 노블컴퍼니의 개인정보 수집·이용·보관·파기에 관한 처리방침입니다.",
+  desc: "주식회사 노블컴퍼니의 개인정보처리방침 — 프로젝트 문의·채용 지원 시 수집하는 개인정보의 항목, 이용 목적, 보관 기간(문의 3년·지원서 1년)과 자동 파기, 열람·정정 요청 방법을 안내합니다.",
   body: `<h1>개인정보처리방침</h1><p>주식회사 노블컴퍼니의 개인정보 수집·이용·보관·파기에 관한 처리방침입니다.</p>${NAV_LINKS}`,
 });
 pages.push({
   path: "/email-policy",
   title: "이메일무단수집거부",
-  desc: "노블컴퍼니 웹사이트의 이메일 주소 무단 수집 거부 고지입니다.",
+  desc: "노블컴퍼니 웹사이트에 게시된 이메일 주소를 수집 프로그램 등 기술적 장치로 무단 수집하는 것을 거부합니다. 위반 시 정보통신망법에 의해 처벌될 수 있습니다.",
   body: `<h1>이메일무단수집거부</h1><p>본 웹사이트에 게시된 이메일 주소가 전자우편 수집 프로그램이나 그 밖의 기술적 장치를 이용하여 무단으로 수집되는 것을 거부합니다.</p>${NAV_LINKS}`,
 });
 

@@ -10,9 +10,9 @@ import { useEffect } from "react";
  */
 
 const SITE_NAME = "노블컴퍼니";
-const SITE_TITLE = "노블컴퍼니 | NOBLE COMPANY";
+const SITE_TITLE = "노블컴퍼니 | 퍼포먼스 마케팅 광고대행사 · 네이버 프리미어 파트너";
 const DEFAULT_DESCRIPTION =
-  "노블컴퍼니 — 작은 날갯짓이 만드는 큰 변화, 나비효과를 경험하세요. IMC · SA · DA · VIRAL 통합 광고 대행";
+  "네이버 프리미어 파트너사 노블컴퍼니 — 브랜드 분석과 데이터로 성과를 만드는 퍼포먼스 마케팅 광고대행사. IMC·검색광고(SA)·디스플레이(DA)·바이럴 캠페인 기획부터 운영·성과 관리까지 함께합니다.";
 
 interface SeoOptions {
   /** 페이지 제목 — "제목 | 노블컴퍼니" 형태로 조합. 생략 시 사이트 기본 제목 */

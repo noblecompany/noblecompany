@@ -5,7 +5,8 @@ import { useSeo } from "../lib/seo";
 export default function EmailPolicy() {
   useSeo({
     title: "이메일무단수집거부",
-    description: "노블컴퍼니 웹사이트의 이메일 주소 무단 수집 거부 고지입니다.",
+    description:
+      "노블컴퍼니 웹사이트에 게시된 이메일 주소를 수집 프로그램 등 기술적 장치로 무단 수집하는 것을 거부합니다. 위반 시 정보통신망법에 의해 처벌될 수 있습니다.",
   });
   return (
     <main>

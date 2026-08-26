@@ -29,6 +29,21 @@ export default function NoticeDetail() {
           description: notice.body.replace(/\s+/g, " ").slice(0, 150),
           image: notice.images[0]?.url,
           ogType: "article",
+          // 뉴스형 구조화 데이터 — 구글 뉴스·AI 검색이 발행일·매체를 인식
+          jsonLd: {
+            "@context": "https://schema.org",
+            "@type": "NewsArticle",
+            headline: notice.title,
+            datePublished: notice.publishedAt,
+            ...(notice.images[0] ? { image: [notice.images[0].url] } : {}),
+            author: { "@type": "Organization", name: "주식회사 노블컴퍼니" },
+            publisher: {
+              "@type": "Organization",
+              name: "주식회사 노블컴퍼니",
+              logo: { "@type": "ImageObject", url: "https://e-noble.kr/apple-touch-icon.png" },
+            },
+            mainEntityOfPage: `https://e-noble.kr/notice/${notice.slug}`,
+          },
         }
       : {},
   );
