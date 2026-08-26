@@ -188,6 +188,7 @@ function DetailPanel({
   onClose,
   onSave,
   onReveal,
+  onReplied,
 }: {
   inquiry: Inquiry;
   onClose: () => void;
