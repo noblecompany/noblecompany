@@ -3614,3 +3614,303 @@ img {
     transform: none;
   }
 }
+
+/* ============================================================
+   공지사항 — 목록·상세·갤러리·라이트박스
+   ============================================================ */
+
+.notice-empty {
+  color: var(--text-dim);
+  padding: 40px 0;
+}
+
+.notice-list {
+  list-style: none;
+  display: grid;
+  gap: 14px;
+}
+
+.notice-item__link {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 24px;
+  align-items: center;
+  padding: 18px;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.notice-item__link:hover {
+  transform: translateY(-3px);
+  border-color: var(--noble-blue);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.14);
+}
+
+.notice-item.is-pinned .notice-item__link {
+  border-color: rgba(46, 128, 232, 0.45);
+  background: rgba(46, 128, 232, 0.05);
+}
+
+.notice-item__thumb {
+  aspect-ratio: 4 / 3;
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--bg-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.notice-item__thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.notice-item__thumb-empty {
+  font-weight: 900;
+  color: var(--text-dim);
+  letter-spacing: -0.02em;
+}
+
+.notice-item__meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text-dim);
+  margin-bottom: 8px;
+}
+
+.notice-item__pin {
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: var(--noble-blue);
+  color: #fff;
+  font-size: 11.5px;
+  font-weight: 800;
+}
+
+.notice-item__title {
+  font-size: clamp(17px, 1.7vw, 21px);
+  font-weight: 800;
+  line-height: 1.45;
+  word-break: keep-all;
+}
+
+.notice-item__more {
+  display: inline-block;
+  margin-top: 12px;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--accent-text);
+}
+
+/* 상세 */
+.notice-detail {
+  max-width: 860px;
+}
+
+.notice-detail__meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--text-dim);
+  margin: 18px 0 10px;
+}
+
+.notice-detail__title {
+  font-size: clamp(24px, 3.4vw, 38px);
+  font-weight: 900;
+  line-height: 1.35;
+  word-break: keep-all;
+}
+
+.notice-gallery {
+  margin-bottom: 36px;
+}
+
+.notice-gallery__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.notice-gallery__head h2 {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text-dim);
+}
+
+.notice-gallery__grid {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.notice-gallery__grid.is-single {
+  grid-template-columns: 1fr;
+}
+
+.notice-gallery__item {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--surface);
+}
+
+.notice-gallery__open {
+  display: block;
+  width: 100%;
+  border: 0;
+  padding: 0;
+  background: var(--bg-soft);
+  cursor: zoom-in;
+}
+
+.notice-gallery__open img {
+  display: block;
+  width: 100%;
+  max-height: 520px;
+  object-fit: contain;
+}
+
+.notice-gallery__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  border-top: 1px solid var(--line-soft);
+}
+
+.notice-gallery__name {
+  font-size: 12.5px;
+  color: var(--text-dim);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.notice-gallery__name em {
+  font-style: normal;
+  opacity: 0.75;
+}
+
+/* 다운로드 버튼 */
+.notice-dl {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.notice-dl--sm {
+  padding: 7px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--line-strong);
+  font-size: 12.5px;
+  font-weight: 800;
+  color: var(--text);
+  flex-shrink: 0;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.notice-dl--sm:hover {
+  background: var(--noble-blue);
+  border-color: var(--noble-blue);
+  color: #fff;
+}
+
+/* 본문 */
+.notice-body {
+  font-size: 16px;
+  line-height: 1.9;
+  color: var(--text);
+}
+
+.notice-body p + p {
+  margin-top: 18px;
+}
+
+.notice-body__source {
+  margin-top: 28px !important;
+  padding-top: 18px;
+  border-top: 1px solid var(--line-soft);
+  font-size: 14px;
+  color: var(--text-dim);
+}
+
+.notice-body__source a {
+  color: var(--accent-text);
+  font-weight: 700;
+  word-break: break-all;
+}
+
+/* 라이트박스 */
+.notice-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  background: rgba(5, 8, 12, 0.92);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  cursor: zoom-out;
+}
+
+.notice-lightbox img {
+  max-width: 100%;
+  max-height: calc(100vh - 120px);
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.notice-lightbox__bar {
+  margin-top: 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 13.5px;
+  cursor: default;
+}
+
+.notice-lightbox__bar .notice-dl--sm {
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.notice-lightbox__bar button {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .notice-item__link {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .notice-gallery__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .notice-gallery__head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

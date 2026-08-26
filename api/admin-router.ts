@@ -77,6 +77,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return await uploads(ctx);
       case "audits":
         return await audits(ctx, id);
+      case "notices":
+        return await noticesAdmin(ctx, id);
       case "export":
         return await exportCsv(ctx);
       case "me":
@@ -801,6 +803,7 @@ const UPLOAD_RULES: Record<string, { ext: string[]; roles: ("hr" | "sales" | "ed
   portfolio: { ext: ["jpg", "jpeg", "png", "webp"], roles: ["editor"] },
   "site-assets": { ext: ["jpg", "jpeg", "png", "webp", "gif"], roles: ["editor"] },
   brochures: { ext: ["pdf"], roles: [] }, // owner 전용
+  notices: { ext: ["jpg", "jpeg", "png", "webp", "gif"], roles: ["editor"] },
 };
 
 async function uploads({ req, res, db, user }: Ctx) {
@@ -829,6 +832,102 @@ async function uploads({ req, res, db, user }: Ctx) {
 }
 
 /* ================================================= 사이트 진단 결과 (owner·sales) */
+
+/* ================================================= 공지사항 CRUD (owner·editor) */
+
+const NoticeImage = z.object({
+  path: z.string().min(1).max(500),
+  name: z.string().min(1).max(200),
+  size: z.number().int().nonnegative().optional(),
+  width: z.number().int().positive().optional(),
+  height: z.number().int().positive().optional(),
+});
+
+const NoticeBody = z.object({
+  slug: z.string().trim().regex(/^[a-z0-9-]+$/).min(3).max(120),
+  title: z.string().trim().min(1).max(200),
+  body: z.string().max(20000),
+  sourceUrl: z.string().max(500).nullable().optional(),
+  sourceName: z.string().max(80).nullable().optional(),
+  images: z.array(NoticeImage).max(30),
+  pinned: z.boolean(),
+  status: z.enum(["draft", "published"]),
+  publishedAt: z.string().min(10),
+});
+
+const mapNoticeAdmin = (db: SupabaseClient, r: Record<string, unknown>) => {
+  const images = (Array.isArray(r.images) ? r.images : []) as Array<Record<string, unknown>>;
+  return {
+    id: r.id, slug: r.slug, title: r.title, body: r.body,
+    sourceUrl: r.source_url, sourceName: r.source_name,
+    images: images.map((img) => ({
+      ...img,
+      url: db.storage.from("notices").getPublicUrl(String(img.path)).data.publicUrl,
+    })),
+    pinned: r.pinned, status: r.status, publishedAt: r.published_at,
+    viewCount: r.view_count, createdAt: r.created_at, updatedAt: r.updated_at,
+  };
+};
+
+async function noticesAdmin({ req, res, db, user }: Ctx, id?: string) {
+  if (req.method === "GET") {
+    const { data, error } = await db.from("notices").select("*")
+      .order("pinned", { ascending: false }).order("published_at", { ascending: false });
+    if (error) throw error;
+    return ok(res, (data ?? []).map((r) => mapNoticeAdmin(db, r)));
+  }
+
+  if (!hasRole(user, ["editor"])) return forbidden(res);
+
+  if (req.method === "POST") {
+    const p = NoticeBody.safeParse(req.body);
+    if (!p.success) return fail(res, "invalid_body", p.error.issues[0]?.message ?? "입력값 오류", 422);
+    const { data: dup } = await db.from("notices").select("id").eq("slug", p.data.slug).maybeSingle();
+    if (dup) return fail(res, "duplicate_slug", "이미 사용 중인 슬러그입니다.", 409);
+    const b = p.data;
+    const { data, error } = await db.from("notices").insert({
+      slug: b.slug, title: b.title, body: b.body, source_url: b.sourceUrl ?? null,
+      source_name: b.sourceName ?? null, images: b.images, pinned: b.pinned,
+      status: b.status, published_at: b.publishedAt,
+    }).select("*").single();
+    if (error) throw error;
+    return ok(res, mapNoticeAdmin(db, data), 201);
+  }
+
+  if (req.method === "PATCH" && id) {
+    const p = NoticeBody.partial().safeParse(req.body);
+    if (!p.success) return badBody(res);
+    const b = p.data;
+    const patch: Record<string, unknown> = { updated_at: new Date().toISOString() };
+    if (b.slug !== undefined) patch.slug = b.slug;
+    if (b.title !== undefined) patch.title = b.title;
+    if (b.body !== undefined) patch.body = b.body;
+    if (b.sourceUrl !== undefined) patch.source_url = b.sourceUrl;
+    if (b.sourceName !== undefined) patch.source_name = b.sourceName;
+    if (b.images !== undefined) patch.images = b.images;
+    if (b.pinned !== undefined) patch.pinned = b.pinned;
+    if (b.status !== undefined) patch.status = b.status;
+    if (b.publishedAt !== undefined) patch.published_at = b.publishedAt;
+    const { data, error } = await db.from("notices").update(patch).eq("id", id).select("*").maybeSingle();
+    if (error) throw error;
+    if (!data) return notFound(res);
+    return ok(res, mapNoticeAdmin(db, data));
+  }
+
+  if (req.method === "DELETE" && id) {
+    // 첨부 이미지도 Storage 에서 함께 정리
+    const { data: row } = await db.from("notices").select("images").eq("id", id).maybeSingle();
+    const paths = ((row?.images as Array<{ path?: string }> | null) ?? [])
+      .map((i) => i.path).filter((p): p is string => Boolean(p));
+    if (paths.length) await db.storage.from("notices").remove(paths).catch(() => undefined);
+    const { error } = await db.from("notices").delete().eq("id", id);
+    if (error) throw error;
+    await audit(db, req, user, "delete", "notices", id);
+    return ok(res);
+  }
+
+  return methodNa(res);
+}
 
 async function audits({ req, res, db, user }: Ctx, id?: string) {
   if (!hasRole(user, ["sales"])) return forbidden(res);

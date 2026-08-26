@@ -12,6 +12,7 @@ const MENU: Array<{ to: string; label: string; icon: ReactNode }> = [
   { to: "/admin/applications", label: "지원자 관리", icon: <IconUsers /> },
   { to: "/admin/jobs", label: "채용공고", icon: <IconFile /> },
   { to: "/admin/works", label: "포트폴리오", icon: <IconImage /> },
+  { to: "/admin/notices", label: "공지사항", icon: <IconMegaphone /> },
   { to: "/admin/site", label: "연혁·조직", icon: <IconTree /> },
   { to: "/admin/visits", label: "접속 통계", icon: <IconChart /> },
   { to: "/admin/settings", label: "사이트 설정", icon: <IconGear /> },
@@ -24,6 +25,7 @@ const TITLE: Record<string, string> = {
   "/admin/applications": "지원자 관리",
   "/admin/jobs": "채용공고",
   "/admin/works": "포트폴리오",
+  "/admin/notices": "공지사항",
   "/admin/site": "연혁·조직",
   "/admin/visits": "접속 통계",
   "/admin/settings": "사이트 설정",
@@ -314,6 +316,14 @@ function IconScan() {
       <circle cx="11" cy="11" r="6" />
       <path d="m20 20-4.5-4.5" />
       <path d="M8.5 11h5M11 8.5v5" />
+    </svg>
+  );
+}
+function IconMegaphone() {
+  return (
+    <svg {...p} aria-hidden="true">
+      <path d="M3 10v4a1 1 0 0 0 1 1h3l6 4V5L7 9H4a1 1 0 0 0-1 1z" />
+      <path d="M16.5 8.5a4 4 0 0 1 0 7M19 6a8 8 0 0 1 0 12" />
     </svg>
   );
 }

@@ -15,6 +15,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== "GET") return fail(res, "method_not_allowed", "GET only", 405);
 
   const db = adminDb();
+  // GET /api/site?resource=notices[&slug=…] — 공지사항 (함수 12개 제한으로 site 에 동거)
+  if (req.query.resource === "notices") return notices(req, res, db);
+
   const now = new Date().toISOString();
 
   const [historyQ, divisionsQ, teamsQ, clientsQ, popupsQ, settingsQ] = await Promise.all([
@@ -64,6 +67,63 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       : null,
     settings,
   });
+}
+
+/* ================================================= 공지사항 (공개) */
+
+const mapNotice = (db: ReturnType<typeof adminDb>, r: Record<string, unknown>, full: boolean) => {
+  const images = (Array.isArray(r.images) ? r.images : []) as Array<{
+    path: string; name: string; size?: number; width?: number; height?: number;
+  }>;
+  return {
+    id: r.id,
+    slug: r.slug,
+    title: r.title,
+    pinned: r.pinned,
+    publishedAt: r.published_at,
+    viewCount: r.view_count,
+    sourceName: r.source_name,
+    sourceUrl: r.source_url,
+    thumb: images[0] ? db.storage.from("notices").getPublicUrl(images[0].path).data.publicUrl : null,
+    ...(full
+      ? {
+          body: r.body,
+          images: images.map((img) => {
+            const url = db.storage.from("notices").getPublicUrl(img.path).data.publicUrl;
+            return {
+              name: img.name,
+              size: img.size ?? null,
+              width: img.width ?? null,
+              height: img.height ?? null,
+              url,
+              // Supabase 공개 URL 의 download 파라미터 → Content-Disposition: attachment
+              downloadUrl: `${url}?download=${encodeURIComponent(img.name)}`,
+            };
+          }),
+        }
+      : {}),
+  };
+};
+
+async function notices(req: VercelRequest, res: VercelResponse, db: ReturnType<typeof adminDb>) {
+  const slug = req.query.slug as string | undefined;
+  if (slug) {
+    const { data, error } = await db
+      .from("notices").select("*").eq("slug", slug).eq("status", "published").maybeSingle();
+    if (error) return fail(res, "db_error", "조회에 실패했습니다.", 500);
+    if (!data) return fail(res, "not_found", "공지를 찾을 수 없습니다.", 404);
+    void db.rpc("increment_notice_view", { p_id: data.id }).then(() => undefined, () => undefined);
+    return ok(res, mapNotice(db, data, true));
+  }
+  const { data, error } = await db
+    .from("notices")
+    .select("id, slug, title, pinned, published_at, view_count, source_name, source_url, images")
+    .eq("status", "published")
+    .order("pinned", { ascending: false })
+    .order("published_at", { ascending: false })
+    .limit(200);
+  if (error) return fail(res, "db_error", "조회에 실패했습니다.", 500);
+  return ok(res, (data ?? []).map((r) => mapNotice(db, r, false)));
 }
 
 /* ================================================= 접속 통계 수집 (C2) */

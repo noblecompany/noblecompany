@@ -8,6 +8,7 @@ import Audits from "./pages/Audits";
 import Dashboard from "./pages/Dashboard";
 import Inquiries from "./pages/Inquiries";
 import Jobs from "./pages/Jobs";
+import Notices from "./pages/Notices";
 import Settings from "./pages/Settings";
 import SiteContent from "./pages/SiteContent";
 import Visits from "./pages/Visits";
@@ -69,6 +70,7 @@ export default function AdminApp() {
         <Route path="/audits" element={<Audits />} />
         <Route path="/jobs" element={<Jobs />} />
         <Route path="/works" element={<Works />} />
+        <Route path="/notices" element={<Notices />} />
         <Route path="/site" element={<SiteContent />} />
         <Route path="/visits" element={<Visits />} />
         <Route path="/settings" element={<Settings />} />

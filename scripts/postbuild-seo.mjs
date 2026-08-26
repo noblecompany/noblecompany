@@ -76,6 +76,13 @@ if (!jobs) {
   }));
 }
 
+let noticeRows = await fetchRows(
+  "notices",
+  "slug,title,body,published_at,pinned,source_name",
+  "&status=eq.published&order=pinned.desc,published_at.desc",
+);
+if (!noticeRows) noticeRows = [];
+
 const { FAQ } = await loadTs("src/data/faq.ts");
 const { solutionTools } = await loadTs("src/data/solutions.ts");
 const { history } = await loadTs("src/data/company.ts");
@@ -267,6 +274,28 @@ ${j.responsibilities?.length ? `<h2>주요 업무</h2>${list(j.responsibilities.
 ${j.requirements?.length ? `<h2>자격 요건</h2>${list(j.requirements.map(esc))}` : ""}
 ${j.preferred?.length ? `<h2>우대 사항</h2>${list(j.preferred.map(esc))}` : ""}
 <p>${a("/careers", "채용공고 전체 보기")}</p>`,
+  });
+}
+
+// 공지사항 목록·상세
+pages.push({
+  path: "/notice",
+  title: "공지사항",
+  desc: "노블컴퍼니 소식 — 네이버 프리미어 파트너사 선정, 서울형 강소기업·청년친화강소기업 선정, 지역사회 후원 등 수상·인증·사회공헌 소식을 전합니다.",
+  body: `<h1>노블컴퍼니 공지사항</h1>
+${list(noticeRows.map((n) => a(`/notice/${n.slug}`, `${n.published_at.slice(0, 10)} — ${n.title}`)))}
+${NAV_LINKS}`,
+});
+for (const n of noticeRows) {
+  const paras = String(n.body).split(/\n\s*\n/).map((s) => s.trim()).filter(Boolean);
+  pages.push({
+    path: `/notice/${n.slug}`,
+    title: n.title,
+    desc: String(n.body).replace(/\s+/g, " ").slice(0, 150),
+    ogType: "article",
+    body: `<h1>${esc(n.title)}</h1><p>${esc(n.published_at.slice(0, 10))}${n.source_name ? ` · ${esc(n.source_name)}` : ""}</p>
+${paras.map((s) => `<p>${esc(s)}</p>`).join("")}
+<p>${a("/notice", "공지사항 목록")}</p>`,
   });
 }
 

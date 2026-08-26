@@ -154,3 +154,56 @@ export function countBrochure(id: string | undefined, action: "view" | "download
     body: JSON.stringify({ id, action }),
   }).catch(() => undefined);
 }
+
+/* ---------------- 공지사항 */
+
+export interface NoticeListItem {
+  id: string;
+  slug: string;
+  title: string;
+  pinned: boolean;
+  publishedAt: string;
+  viewCount: number;
+  sourceName: string | null;
+  sourceUrl: string | null;
+  thumb: string | null;
+}
+
+export interface NoticeImage {
+  name: string;
+  size: number | null;
+  width: number | null;
+  height: number | null;
+  url: string;
+  downloadUrl: string;
+}
+
+export interface NoticeDetail extends NoticeListItem {
+  body: string;
+  images: NoticeImage[];
+}
+
+export function useNotices(): { notices: NoticeListItem[]; loading: boolean } {
+  const { data, loading } = useCached<NoticeListItem[]>(
+    "notices",
+    async () => (await apiGet<NoticeListItem[]>("/api/site?resource=notices")) ?? [],
+    [],
+  );
+  return { notices: data, loading };
+}
+
+/** 상세는 슬러그별 캐시. 서버가 조회수를 함께 집계한다 */
+export function useNotice(slug: string | undefined): {
+  notice: NoticeDetail | null;
+  loading: boolean;
+} {
+  const { data, loading } = useCached<NoticeDetail | null>(
+    `notice:${slug ?? ""}`,
+    () =>
+      slug
+        ? apiGet<NoticeDetail>(`/api/site?resource=notices&slug=${encodeURIComponent(slug)}`)
+        : Promise.resolve(null),
+    null,
+  );
+  return { notice: data, loading };
+}

@@ -61,7 +61,7 @@ export async function adminDownloadCsv(type: "inquiries" | "applications"): Prom
 
 /** Storage 업로드 — 어드민 signed URL 발급 후 직접 PUT. 공개 URL 을 돌려준다 */
 export async function adminUpload(
-  bucket: "portfolio" | "site-assets" | "brochures",
+  bucket: "portfolio" | "site-assets" | "brochures" | "notices",
   file: File | Blob,
   filename: string,
 ): Promise<{ path: string; publicUrl: string }> {
@@ -281,4 +281,32 @@ export function formatBytes(n: number): string {
   if (n >= 1024 * 1024) return `${(n / 1024 / 1024).toFixed(1)}MB`;
   if (n >= 1024) return `${Math.round(n / 1024)}KB`;
   return `${n}B`;
+}
+
+/* ================================================= 공지사항 */
+
+export interface NoticeImage {
+  path: string;
+  name: string;
+  size?: number;
+  width?: number;
+  height?: number;
+  /** 서버가 계산한 공개 URL (저장하지 않음) */
+  url?: string;
+}
+
+export interface AdminNotice {
+  id: string;
+  slug: string;
+  title: string;
+  body: string;
+  sourceUrl: string | null;
+  sourceName: string | null;
+  images: NoticeImage[];
+  pinned: boolean;
+  status: "draft" | "published";
+  publishedAt: string;
+  viewCount: number;
+  createdAt: string;
+  updatedAt: string;
 }

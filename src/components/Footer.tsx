@@ -56,6 +56,7 @@ export default function Footer() {
           <a href="tel:024741941">문의전화</a>
           <a href="mailto:noble@e-noble.kr">메일</a>
           <BrochureCta variant="link" />
+          <Link to="/notice">공지사항</Link>
           <Link to="/careers">채용공고</Link>
           <Link to="/contact">오시는길</Link>
           <Link to="/privacy">개인정보처리방침</Link>
