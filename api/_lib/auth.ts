@@ -34,10 +34,18 @@ export async function requireAdmin(
     .eq("id", userData.user.id)
     .maybeSingle();
 
-  // Auth 계정은 있지만 admin_users 미등록이면 자동 등록(owner) —
-  // 5인 소수 운영이라 Supabase 대시보드에서 계정을 만들면 바로 쓸 수 있게 한다.
+  // Auth 계정은 있지만 admin_users 미등록인 경우 —
+  // 공개 회원가입으로 만들어진 계정이 관리자가 되는 것을 막기 위해,
+  // ADMIN_EMAILS(쉼표 구분) 허용 목록에 있는 이메일만 자동 등록(owner)한다.
+  // 목록에 없으면 401 — 계정은 Supabase 대시보드에서 admin_users 에 직접 추가해야 한다.
   if (!admin) {
-    const name = userData.user.email?.split("@")[0] ?? "admin";
+    const email = (userData.user.email ?? "").toLowerCase();
+    const allow = (process.env.ADMIN_EMAILS ?? "")
+      .split(",")
+      .map((s) => s.trim().toLowerCase())
+      .filter(Boolean);
+    if (!email || !allow.includes(email)) return null;
+    const name = email.split("@")[0] || "admin";
     const { data: created } = await db
       .from("admin_users")
       .insert({ id: userData.user.id, name, role: "owner" })

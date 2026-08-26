@@ -2544,9 +2544,10 @@ img {
     right: 0;
     flex-direction: column;
     gap: 0;
-    background: rgba(11, 13, 16, 0.97);
+    /* 테마를 따르는 배경 — 라이트 모드에서 검정 글자가 묻히지 않게 (구 다크 고정색 제거) */
+    background: color-mix(in srgb, var(--bg) 97%, transparent);
     backdrop-filter: blur(14px);
-    border-bottom: 1px solid var(--noble-line);
+    border-bottom: 1px solid var(--line);
     padding: 12px 24px 24px;
     display: none;
   }

@@ -61,6 +61,44 @@ export default function AdminApp() {
 
   if (!session) return <Login />;
 
+  return <Authorized onLogout={() => void supabase?.auth.signOut()} />;
+}
+
+/**
+ * 로그인 세션이 있어도 admin_users 에 등록된 계정만 콘솔을 연다.
+ * (공개 회원가입으로 만든 계정 차단 — 서버 requireAdmin 과 같은 기준)
+ */
+function Authorized({ onLogout }: { onLogout: () => void }) {
+  const [state, setState] = useState<"checking" | "ok" | "denied">("checking");
+
+  useEffect(() => {
+    import("./api")
+      .then(({ adminApi }) => adminApi("/me"))
+      .then(() => setState("ok"))
+      .catch(() => setState("denied"));
+  }, []);
+
+  if (state === "checking") return null;
+
+  if (state === "denied") {
+    return (
+      <div className="adm-login">
+        <div className="adm-login__card">
+          <div className="adm-login__brand">
+            noble<b>.</b>admin
+          </div>
+          <p className="adm-login__desc">이 계정은 관리자 권한이 없습니다.</p>
+          <p className="adm-login__dev">
+            관리자 등록은 대표 계정(owner)이 Supabase 대시보드에서 진행합니다.
+          </p>
+          <button type="button" className="adm-btn adm-btn--primary adm-login__submit" onClick={onLogout}>
+            다른 계정으로 로그인
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <AdminLayout onLogout={() => void supabase?.auth.signOut()}>
       <Routes>

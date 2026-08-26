@@ -1,5 +1,26 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "redirects": [
+    { "source": "/board/job", "destination": "/careers", "permanent": true },
+    { "source": "/board/job/:path*", "destination": "/careers", "permanent": true },
+    { "source": "/board/notice", "destination": "/notice", "permanent": true },
+    { "source": "/board/notice/:path*", "destination": "/notice", "permanent": true },
+    { "source": "/board/:path*", "destination": "/notice", "permanent": true },
+    { "source": "/company/history", "destination": "/about/history", "permanent": true },
+    { "source": "/company/location", "destination": "/contact", "permanent": true },
+    { "source": "/company/portfolio", "destination": "/work", "permanent": true },
+    { "source": "/company/:path*", "destination": "/about", "permanent": true },
+    { "source": "/customer/:path*", "destination": "/contact", "permanent": true },
+    { "source": "/doc/private", "destination": "/privacy", "permanent": true },
+    { "source": "/doc/policy", "destination": "/privacy", "permanent": true },
+    { "source": "/doc/antiemail", "destination": "/email-policy", "permanent": true },
+    { "source": "/solution/:path*", "destination": "/solution", "permanent": true },
+    { "source": "/work/da", "destination": "/work", "permanent": true },
+    { "source": "/work/imc", "destination": "/work", "permanent": true },
+    { "source": "/work/search", "destination": "/work", "permanent": true },
+    { "source": "/work/viral", "destination": "/work", "permanent": true },
+    { "source": "/popup/:path*", "destination": "/", "permanent": true }
+  ],
   "rewrites": [
     { "source": "/api/admin/:path*", "destination": "/api/admin-router?path=:path*" },
     { "source": "/((?!api/).*)", "destination": "/index.html" }
