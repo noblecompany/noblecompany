@@ -452,8 +452,14 @@ async function jobs({ req, res, db, user }: Ctx, id?: string) {
     if (b.preferred !== undefined) patch.preferred = b.preferred;
     if (b.status !== undefined) patch.status = b.status;
     if (b.sortOrder !== undefined) patch.sort_order = b.sortOrder;
+    if (b.applyLinks !== undefined) patch.apply_links = cleanLinks(b.applyLinks);
     const { data, error } = await db.from("job_postings").update(patch).eq("id", id).select("*").maybeSingle();
-    if (error) throw error;
+    if (error) {
+      // 0009 마이그레이션 전 — 컬럼 없음(42703)을 사람이 읽을 수 있는 안내로
+      if ((error as { code?: string }).code === "42703" && /apply_links/.test(error.message))
+        return fail(res, "migration_required", "외부 지원 링크 저장에는 Supabase SQL 0009(apply_links 컬럼) 실행이 먼저 필요합니다.", 409);
+      throw error;
+    }
     if (!data) return notFound(res);
     return ok(res, mapJob(data));
   }
