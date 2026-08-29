@@ -4,6 +4,7 @@ import { ActionButton } from "seed-design/ui/action-button";
 import { TextField, TextFieldInput } from "seed-design/ui/text-field";
 import BrochureCta from "../components/BrochureCta";
 import Reveal from "../components/Reveal";
+import { ACE_CONVERSION, aceVirtualPage } from "../lib/acecounter";
 import { useSeo } from "../lib/seo";
 
 /** 슬라이드 15·45~46 — 선택형 UI 중심의 문의 폼 */
@@ -125,6 +126,7 @@ export default function Contact() {
       if (res.status === 201) {
         setDone(true);
         setForm(INITIAL);
+        aceVirtualPage(ACE_CONVERSION.contact); // 에이스카운터 전환(문의 접수)
         return;
       }
       if (res.status === 429) {

@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <!-- 배포 추적 마커 — 어느 커밋이 서빙 중인지 밖에서 확인하는 용도 -->
-    <meta name="x-build" content="auth-v17" />
+    <meta name="x-build" content="ace-spa-v1" />
     <meta name="description" content="네이버 프리미어 파트너사 노블컴퍼니 — 브랜드 분석과 데이터로 성과를 만드는 퍼포먼스 마케팅 광고대행사. IMC·검색광고(SA)·디스플레이(DA)·바이럴 캠페인 기획부터 운영·성과 관리까지 함께합니다." />
     <!-- SEO·AEO 기본 메타 — 라우트별 값은 src/lib/seo.ts 훅이 런타임에 교체한다 -->
     <meta property="og:site_name" content="노블컴퍼니" />
@@ -54,7 +54,9 @@
       href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
     />
     <!-- 구 사이트에서 승계한 외부 스크립트 (2026-08-26 도메인 이관) -->
-    <!-- 에이스카운터 (gc=AZ1A106154) — e-noble.kr용 새 계정 설정 -->
+    <!-- 에이스카운터 (gc=AZ1A106154) — e-noble.kr용 새 계정 설정. 원본: script(e-noble.kr)/acecounter_script_m.txt
+         · 로드 시 페이지뷰 1회만 보내므로 라우트 이동은 src/lib/acecounter.ts 의 AM_PL 가상 페이지뷰로 보충한다
+         · utm_* 은 자동 수집. 'NaPm,Ncisy' 는 네이버 광고 자동추적 파라미터(URL 집계 시 제거 대상) -->
     <!-- AceCounter Gathering Script V.9.0.2025011001 -->
     <script language='javascript'>
       var _AceGID=(function(){var Inf=['e-noble.kr','e-noble.kr,www.e-noble.kr','AZ1A106154','1','NaPm,Ncisy','1']; var _CI=(!_AceGID)?[]:_AceGID.val;var _N=0;if(_CI.join('.').indexOf(Inf[2])<0){ _CI.push(Inf);  _N=_CI.length; } return {o: _N,val:_CI}; })();

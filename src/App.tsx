@@ -1,5 +1,6 @@
-import { Suspense, lazy, useEffect } from "react";
+import { Suspense, lazy, useEffect, useRef } from "react";
 import { Route, Routes, useLocation } from "react-router-dom";
+import { aceVirtualPage } from "./lib/acecounter";
 import ButterflyCta from "./components/ButterflyCta";
 import Footer from "./components/Footer";
 import Header from "./components/Header";
@@ -47,11 +48,24 @@ function usePageTracking(pathname: string) {
   }, [pathname]);
 }
 
+/** 에이스카운터 — 라우트 이동마다 가상 페이지뷰. 최초 진입은 index.html 의 ac.js 가 이미 보냈으므로 건너뛴다 */
+function useAceCounterPageview(pathname: string, search: string) {
+  const first = useRef(true);
+  useEffect(() => {
+    if (first.current) {
+      first.current = false;
+      return;
+    }
+    aceVirtualPage(pathname + search);
+  }, [pathname, search]);
+}
+
 export default function App() {
   // 어드민 화면에는 공개 사이트의 헤더·푸터·나비 CTA를 얹지 않는다
-  const { pathname } = useLocation();
+  const { pathname, search } = useLocation();
   const isAdmin = pathname.startsWith("/admin");
   usePageTracking(pathname);
+  useAceCounterPageview(pathname, search);
 
   if (isAdmin) {
     return (

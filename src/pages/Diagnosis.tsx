@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { ActionButton } from "seed-design/ui/action-button";
 import { IconLock } from "../components/Icons";
 import Reveal from "../components/Reveal";
+import { ACE_CONVERSION, aceVirtualPage } from "../lib/acecounter";
 import { useSeo } from "../lib/seo";
 
 /**
@@ -92,6 +93,7 @@ export default function Diagnosis() {
         return;
       }
       setResult(body.data);
+      aceVirtualPage(ACE_CONVERSION.diagnosis); // 에이스카운터 전환(진단 완료)
     } catch {
       setError("진단 서버에 연결하지 못했습니다. 잠시 후 다시 시도해 주세요.");
     } finally {
