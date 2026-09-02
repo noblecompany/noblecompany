@@ -38,10 +38,9 @@ export default function Footer() {
                 <a href={`mailto:${c.mail}`}>{c.mail}</a>
               </p>
             ))}
-            {/* TODO: 네이버 블로그 URL 확정 시 교체 */}
             <p style={{ marginTop: 12 }}>
               <a
-                href="https://blog.naver.com"
+                href="https://blog.naver.com/noblelwh"
                 target="_blank"
                 rel="noreferrer"
                 className="accent"
