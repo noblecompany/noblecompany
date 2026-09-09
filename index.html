@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <!-- 배포 추적 마커 — 어느 커밋이 서빙 중인지 밖에서 확인하는 용도 -->
-    <meta name="x-build" content="ace-spa-v1" />
+    <meta name="x-build" content="naver-cts-v1" />
     <meta name="description" content="네이버 프리미어 파트너사 노블컴퍼니 — 브랜드 분석과 데이터로 성과를 만드는 퍼포먼스 마케팅 광고대행사. IMC·검색광고(SA)·디스플레이(DA)·바이럴 캠페인 기획부터 운영·성과 관리까지 함께합니다." />
     <!-- SEO·AEO 기본 메타 — 라우트별 값은 src/lib/seo.ts 훅이 런타임에 교체한다 -->
     <meta property="og:site_name" content="노블컴퍼니" />
@@ -63,6 +63,20 @@
       var _AceCounter=(function(){var G=_AceGID;var _sc=document.createElement('script');var _sm=document.getElementsByTagName('script')[0];if(G.o!=0){var _A=G.val[G.o-1];var _U=(_A[4]).replace(/\,/g,'_');_sc.src='https:/'+'/cr.acecounter.com/ac.j'+'s?gc='+_A[2]+'&py='+_A[1]+'&up='+_U+'&rd='+(new Date().getTime());_sm.parentNode.insertBefore(_sc,_sm);return _sc.src;}})();
     </script>
     <!-- AceCounter Gathering Script End -->
+    <!-- 네이버 광고 전환추적(프리미엄 로그분석) 공통 스크립트 (2026-09-09, wa=s_4e599ec1f3a0). 가이드: https://navercts.gitbook.io/guide
+         · 로드 시 페이지뷰 1회만 보내므로 라우트 이동은 src/lib/naverlog.ts 가 wcs_do() 를 다시 호출한다
+         · 전환(문의 lead · 진단 custom001 · 지원 custom002)은 각 완료 시점 코드에서 wcs.trans() 로 보낸다
+         · inflow 는 1차 도메인만 지정 (www.e-noble.kr 은 e-noble.kr 로 307 리다이렉트됨) -->
+    <script type="text/javascript" src="//wcs.naver.net/wcslog.js"></script>
+    <script type="text/javascript">
+      if (!wcs_add) var wcs_add = {};
+      wcs_add["wa"] = "s_4e599ec1f3a0";
+      if (!_nasa) var _nasa = {};
+      if (window.wcs) {
+        wcs.inflow("e-noble.kr");
+        wcs_do();
+      }
+    </script>
     <!-- 네이버 톡톡 상담 배너 -->
     <script async src="https://partner.talk.naver.com/banners/script"></script>
     <title>노블컴퍼니 | 퍼포먼스 마케팅 광고대행사 · 네이버 프리미어 파트너</title>

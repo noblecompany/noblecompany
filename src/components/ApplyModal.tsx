@@ -3,6 +3,7 @@ import { ActionButton } from "seed-design/ui/action-button";
 import { TextField, TextFieldInput } from "seed-design/ui/text-field";
 import { applyLinkBrand, type JobPosting } from "../data/careers";
 import { ACE_CONVERSION, aceVirtualPage } from "../lib/acecounter";
+import { NAVER_CONVERSION, naverConversion } from "../lib/naverlog";
 
 /** 조사 '로/으로' — 받침 있으면 '으로'(ㄹ 받침 제외), 없거나 한글이 아니면 '로'. 예) 사람인으로 · 잡코리아로 · 원티드로 */
 function josaRo(word: string): string {
@@ -146,6 +147,7 @@ export default function ApplyModal({ job, onClose }: { job: JobPosting; onClose:
       if (res.status === 201) {
         setDone(true);
         aceVirtualPage(ACE_CONVERSION.apply); // 에이스카운터 전환(채용 지원)
+        naverConversion(NAVER_CONVERSION.apply); // 네이버 광고 전환(채용 지원 → custom002)
         return;
       }
       if (res.status === 429) {

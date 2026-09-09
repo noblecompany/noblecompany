@@ -1,6 +1,7 @@
 import { Suspense, lazy, useEffect, useRef } from "react";
 import { Route, Routes, useLocation } from "react-router-dom";
 import { aceVirtualPage } from "./lib/acecounter";
+import { naverPageview } from "./lib/naverlog";
 import ButterflyCta from "./components/ButterflyCta";
 import Footer from "./components/Footer";
 import Header from "./components/Header";
@@ -57,6 +58,7 @@ function useAceCounterPageview(pathname: string, search: string) {
       return;
     }
     aceVirtualPage(pathname + search);
+    naverPageview(pathname);
   }, [pathname, search]);
 }
 
