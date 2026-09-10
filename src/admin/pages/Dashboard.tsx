@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { adminApi, INQUIRY_STATUS_LABEL, timeAgo, type InquiryStatus } from "../api";
+import { adminApi, INQUIRY_STATUS_LABEL, formatDateTime, type InquiryStatus } from "../api";
 
 interface DashboardData {
   todayInquiries: number;
@@ -67,7 +67,7 @@ export default function Dashboard() {
                       {INQUIRY_STATUS_LABEL[q.status]}
                     </span>
                   </td>
-                  <td className="adm-dim adm-right">{timeAgo(q.createdAt)}</td>
+                  <td className="adm-dim adm-right adm-nowrap">{formatDateTime(q.createdAt)}</td>
                 </tr>
               ))}
               {data.recentInquiries.length === 0 && (

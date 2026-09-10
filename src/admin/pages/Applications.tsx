@@ -5,8 +5,7 @@ import {
   adminDownloadCsv,
   APPLICATION_STATUS_LABEL,
   APPLICATION_STEPS,
-  formatDate,
-  timeAgo,
+  formatDateTime,
   type Application,
   type ApplicationStatus,
 } from "../api";
@@ -151,7 +150,7 @@ export default function Applications() {
                       {APPLICATION_STATUS_LABEL[r.status]}
                     </span>
                   </td>
-                  <td className="adm-dim adm-right">{timeAgo(r.createdAt)}</td>
+                  <td className="adm-dim adm-right adm-nowrap">{formatDateTime(r.createdAt)}</td>
                 </tr>
               ))}
             {!loading && filtered.length === 0 && (
@@ -229,7 +228,7 @@ function DetailPanel({
             </span>
             <h2>{a.name}</h2>
             <p className="adm-dim">
-              {a.postingTitle} · {formatDate(a.createdAt)} 접수
+              {a.postingTitle} · {formatDateTime(a.createdAt)} 접수
             </p>
           </div>
           <button type="button" className="adm-iconbtn" onClick={onClose} aria-label="닫기">

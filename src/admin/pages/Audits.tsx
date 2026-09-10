@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { adminApi, formatDate, timeAgo } from "../api";
+import { adminApi, formatDate, formatDateTime } from "../api";
 import { IconCheck, IconMinus, IconX } from "../../components/Icons";
 
 type Status = "pass" | "warn" | "fail";
@@ -141,7 +141,7 @@ export default function Audits() {
                   <td className="adm-right" style={{ color: r.failCount ? "#d64545" : undefined }}>
                     {r.failCount}
                   </td>
-                  <td className="adm-dim adm-right">{timeAgo(r.createdAt)}</td>
+                  <td className="adm-dim adm-right adm-nowrap">{formatDateTime(r.createdAt)}</td>
                   <td className="adm-right">
                     <button
                       type="button"
@@ -200,7 +200,7 @@ function DetailDrawer({ audit: a, onClose }: { audit: AuditDetail; onClose: () =
             </span>
             <h2 style={{ wordBreak: "break-all" }}>{a.url}</h2>
             <p className="adm-dim">
-              {formatDate(a.createdAt)} 진단 · 통과 {a.passCount} / 경고 {a.warnCount} / 실패{" "}
+              {formatDateTime(a.createdAt)} 진단 · 통과 {a.passCount} / 경고 {a.warnCount} / 실패{" "}
               {a.failCount}
               {a.meta.timeMs ? ` · 응답 ${a.meta.timeMs}ms` : ""}
               {a.ip ? ` · IP ${a.ip}` : ""}

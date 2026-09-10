@@ -552,6 +552,10 @@
   text-align: right;
 }
 
+.adm-nowrap {
+  white-space: nowrap;
+}
+
 .adm-empty {
   text-align: center;
   padding: 40px !important;
@@ -1544,6 +1548,10 @@
    .adm-table th 의 text-align 이 .adm-right 보다 특이도가 높아 th 전용 규칙이 필요하다 */
 .adm-table th.adm-right {
   text-align: right;
+}
+
+.adm-nowrap {
+  white-space: nowrap;
 }
 
 /* ---------- 사이트 진단 리포트 ---------- */

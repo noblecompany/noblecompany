@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState, type PropsWithChildren, type 
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { supabase } from "../lib/supabaseClient";
 import { useTheme } from "../lib/theme";
-import { adminApi, timeAgo, type AdminNotification } from "./api";
+import { adminApi, formatDateTime, type AdminNotification } from "./api";
 
 /** 사이드바 메뉴 — 설계 §6.1 정보 구조 */
 const MENU: Array<{ to: string; label: string; icon: ReactNode }> = [
@@ -242,7 +242,7 @@ function NotificationBell() {
                     {n.type === "inquiry" ? "문의" : "지원"}
                   </span>
                   <span className="adm-bell__title">{n.title}</span>
-                  <span className="adm-bell__time">{timeAgo(n.createdAt)}</span>
+                  <span className="adm-bell__time">{formatDateTime(n.createdAt)}</span>
                 </Link>
               </li>
             ))}

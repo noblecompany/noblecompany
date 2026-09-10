@@ -1053,20 +1053,27 @@ async function exportCsv({ req, res, db, user }: Ctx) {
     return `"${s.replace(/"/g, '""')}"`;
   };
 
+  // 접수일시는 DB의 UTC 원본이 아니라 어드민 화면과 같은 한국시간 yyyy.MM.dd HH:mm 으로 내보낸다 (리드 대조용)
+  const kst = (iso: string) => {
+    const d = new Date(new Date(iso).getTime() + 9 * 60 * 60 * 1000);
+    const p = (n: number) => String(n).padStart(2, "0");
+    return `${d.getUTCFullYear()}.${p(d.getUTCMonth() + 1)}.${p(d.getUTCDate())} ${p(d.getUTCHours())}:${p(d.getUTCMinutes())}`;
+  };
+
   let csv: string;
   if (type === "inquiries") {
     const { data, error } = await db.from("inquiries").select("*").order("created_at", { ascending: false });
     if (error) throw error;
-    const head = ["접수일", "회사명", "담당자", "연락처", "이메일", "문의유형", "예산", "기간", "내용", "상태", "담당AE", "메모", "보관기한"];
+    const head = ["접수일시", "회사명", "담당자", "연락처", "이메일", "문의유형", "예산", "기간", "내용", "상태", "담당AE", "메모", "보관기한"];
     csv = [head.join(",")].concat((data ?? []).map((r) =>
-      [r.created_at, r.company, r.name, r.phone, r.email, r.types, r.budget, r.period, r.message, r.status, r.assignee, r.memo, r.retention_until].map(esc).join(","),
+      [kst(r.created_at), r.company, r.name, r.phone, r.email, r.types, r.budget, r.period, r.message, r.status, r.assignee, r.memo, r.retention_until].map(esc).join(","),
     )).join("\r\n");
   } else {
     const { data, error } = await db.from("job_applications").select("*").order("created_at", { ascending: false });
     if (error) throw error;
-    const head = ["접수일", "공고", "지원자", "연락처", "이메일", "경력", "자기소개", "포트폴리오", "전형단계", "메모", "보관기한"];
+    const head = ["접수일시", "공고", "지원자", "연락처", "이메일", "경력", "자기소개", "포트폴리오", "전형단계", "메모", "보관기한"];
     csv = [head.join(",")].concat((data ?? []).map((r) =>
-      [r.created_at, r.posting_title, r.name, r.phone, r.email, r.career_years, r.message, r.portfolio_url, r.status, r.memo, r.retention_until].map(esc).join(","),
+      [kst(r.created_at), r.posting_title, r.name, r.phone, r.email, r.career_years, r.message, r.portfolio_url, r.status, r.memo, r.retention_until].map(esc).join(","),
     )).join("\r\n");
   }
 

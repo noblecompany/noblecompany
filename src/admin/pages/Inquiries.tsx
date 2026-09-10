@@ -3,9 +3,8 @@ import { useSearchParams } from "react-router-dom";
 import {
   adminApi,
   adminDownloadCsv,
-  formatDate,
   INQUIRY_STATUS_LABEL,
-  timeAgo,
+  formatDateTime,
   type Inquiry,
   type InquiryStatus,
 } from "../api";
@@ -156,7 +155,7 @@ export default function Inquiries() {
                     </span>
                   </td>
                   <td className="adm-dim">{r.assignee ?? "—"}</td>
-                  <td className="adm-dim adm-right">{timeAgo(r.createdAt)}</td>
+                  <td className="adm-dim adm-right adm-nowrap">{formatDateTime(r.createdAt)}</td>
                 </tr>
               ))}
             {!loading && filtered.length === 0 && (
@@ -272,7 +271,7 @@ function DetailPanel({
             </span>
             <h2>{q.company}</h2>
             <p className="adm-dim">
-              {formatDate(q.createdAt)} 접수 · 보관기한 {q.retentionUntil}
+              {formatDateTime(q.createdAt)} 접수 · 보관기한 {q.retentionUntil}
             </p>
           </div>
           <button type="button" className="adm-iconbtn" onClick={onClose} aria-label="닫기">

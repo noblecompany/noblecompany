@@ -262,14 +262,11 @@ export const JOB_STATUS_LABEL: Record<AdminJob["status"], string> = {
 
 /* ================================================= 표시 유틸 */
 
-export function timeAgo(iso: string): string {
-  const m = Math.max(1, Math.floor((Date.now() - new Date(iso).getTime()) / 60000));
-  if (m < 60) return `${m}분 전`;
-  const h = Math.floor(m / 60);
-  if (h < 24) return `${h}시간 전`;
-  const d = Math.floor(h / 24);
-  if (d < 30) return `${d}일 전`;
-  return formatDate(iso);
+/** 접수·진단 시각 표기 — 리드 측정 대조용으로 상대시간("2시간 전") 대신 절대시각을 쓴다 */
+export function formatDateTime(iso: string): string {
+  const d = new Date(iso);
+  const p = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}.${p(d.getMonth() + 1)}.${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
 }
 
 export function formatDate(iso: string): string {
